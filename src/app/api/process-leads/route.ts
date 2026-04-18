@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import Anthropic from "@anthropic-ai/sdk";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import { tavily } from "@tavily/core";
 
-const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 
 export interface Lead {
   name: string;
@@ -125,16 +125,9 @@ export async function POST(req: NextRequest) {
         const prompt = buildPrompt(lead, businessName, product, signals);
 
         try {
-          const message = await client.messages.create({
-            model: "claude-haiku-4-5-20251001",
-            max_tokens: 300,
-            messages: [{ role: "user", content: prompt }],
-          });
-
-          const content = message.content[0];
-          if (content.type !== "text") return null;
-
-          const raw = content.text.replace(/```json|```/g, "").trim();
+          const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+          const result = await model.generateContent(prompt);
+          const raw = result.response.text().replace(/```json|```/g, "").trim();
           const parsed = JSON.parse(raw);
 
           if (signals && signals.scoreBoost > 0) {
@@ -142,7 +135,8 @@ export async function POST(req: NextRequest) {
           }
 
           return { ...lead, ...parsed, signals } as ProcessedLead;
-        } catch {
+        } catch (e) {
+          console.error("Scoring error for", lead.name, e);
           return null;
         }
       })
