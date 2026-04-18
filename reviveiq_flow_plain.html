@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #fff;
+    color: #111;
+    font-size: 10.5pt;
+    line-height: 1.7;
+  }
+
+  .page {
+    width: 210mm;
+    padding: 20mm 22mm 20mm;
+  }
+
+  /* Header */
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 2px solid #111;
+    padding-bottom: 12px;
+    margin-bottom: 24px;
+  }
+  .logo { font-size: 15pt; font-weight: 900; letter-spacing: -0.5px; }
+  .logo span { color: #00b87a; }
+  .date { font-size: 8.5pt; color: #999; }
+
+  /* Subtitle */
+  .subtitle {
+    background: #f4f4f4;
+    border-left: 3px solid #00b87a;
+    padding: 10px 16px;
+    font-size: 10pt;
+    color: #333;
+    font-style: italic;
+    margin-bottom: 28px;
+    border-radius: 0 4px 4px 0;
+  }
+
+  /* Sections */
+  h2 {
+    font-size: 12pt;
+    font-weight: 800;
+    margin-top: 28px;
+    margin-bottom: 10px;
+    color: #111;
+    letter-spacing: -0.2px;
+  }
+  h2:first-of-type { margin-top: 0; }
+
+  p { margin-bottom: 10px; color: #222; }
+
+  /* Numbered list */
+  ol {
+    padding-left: 20px;
+    margin-bottom: 12px;
+  }
+  ol li {
+    padding: 4px 0;
+    color: #333;
+    font-size: 10pt;
+  }
+
+  /* Bullet list */
+  ul {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 12px;
+  }
+  ul li {
+    padding: 4px 0 4px 18px;
+    position: relative;
+    color: #333;
+    font-size: 10pt;
+  }
+  ul li::before {
+    content: '—';
+    position: absolute;
+    left: 0;
+    color: #00b87a;
+    font-weight: 700;
+  }
+
+  /* Steps */
+  .step {
+    margin-bottom: 14px;
+  }
+  .step-title {
+    font-weight: 700;
+    font-size: 10.5pt;
+    margin-bottom: 4px;
+    color: #111;
+  }
+  .step-title span {
+    display: inline-block;
+    background: #00b87a;
+    color: #fff;
+    font-size: 8pt;
+    font-weight: 800;
+    padding: 2px 8px;
+    border-radius: 3px;
+    margin-right: 8px;
+    letter-spacing: 0.3px;
+  }
+  .step-body { padding-left: 44px; }
+  .step-body p { margin-bottom: 4px; }
+  .step-body ul { margin-bottom: 0; }
+
+  /* Score bands inline */
+  .bands {
+    display: flex;
+    gap: 10px;
+    margin: 8px 0 4px;
+    padding-left: 44px;
+  }
+  .band {
+    flex: 1;
+    border-radius: 6px;
+    padding: 8px 10px;
+    text-align: center;
+    font-size: 9pt;
+  }
+  .band strong { display: block; font-size: 12pt; font-weight: 900; line-height: 1.1; margin-bottom: 2px; }
+  .band.hot { background: #f0fdf4; color: #15803d; }
+  .band.warm { background: #fffbeb; color: #b45309; }
+  .band.cold { background: #fef2f2; color: #b91c1c; }
+
+  /* Example quote */
+  .example {
+    background: #f9f9f9;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    padding: 10px 14px;
+    font-size: 9.5pt;
+    color: #555;
+    font-style: italic;
+    margin: 8px 0 4px 44px;
+  }
+
+  /* Rule */
+  hr {
+    border: none;
+    border-top: 1px solid #e5e7eb;
+    margin: 24px 0;
+  }
+
+  /* Tech line */
+  .tech-line {
+    background: #0d0d0d;
+    color: #ccc;
+    border-radius: 6px;
+    padding: 12px 16px;
+    font-size: 9pt;
+    letter-spacing: 0.2px;
+    margin-bottom: 12px;
+  }
+  .tech-line span { color: #00b87a; font-weight: 600; }
+
+  /* Footer */
+  .footer {
+    margin-top: 32px;
+    border-top: 1px solid #e5e7eb;
+    padding-top: 10px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 8pt;
+    color: #aaa;
+  }
+
+  @media print {
+    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="header">
+    <div class="logo">Revive<span>IQ</span> — Product Flow</div>
+    <div class="date">April 2026</div>
+  </div>
+
+  <div class="subtitle">
+    "An engine that tracks real-time data about company metrics — funding, growth signals, job postings, and more — then generates a score and notifies you when it's the ideal time to reach out."
+  </div>
+
+  <h2>What it is</h2>
+  <p>ReviveIQ takes your pile of dead/cold leads, scores each one using Claude AI and live web data, and gives your calling team a ranked list — hottest leads at the top — so they stop calling blind and start calling smart.</p>
+
+  <hr />
+
+  <h2>The problem</h2>
+  <p>Every sales team has a graveyard of leads who said "follow up in 3 months" and were forgotten. Right now, the process is:</p>
+  <ol>
+    <li>Every 6 months, dump all cold leads on the calling team with zero context</li>
+    <li>Team calls in random order — a ₹50K deal treated the same as a ₹50L one</li>
+    <li>Most leads are never contacted at all</li>
+    <li>Hot leads sit at the bottom of the list, untouched</li>
+  </ol>
+  <p>No prioritisation. No intelligence. Revenue just leaks.</p>
+
+  <hr />
+
+  <h2>How ReviveIQ works</h2>
+
+  <div class="step">
+    <div class="step-title"><span>01</span> Connect your CRM</div>
+    <div class="step-body">
+      <p>HubSpot, Salesforce, Pipedrive, Zoho, Teamgate. Dead leads pull in automatically. CSV upload also available.</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-title"><span>02</span> AI searches the web per lead</div>
+    <div class="step-body">
+      <ul>
+        <li>Did the company raise funding recently?</li>
+        <li>Are they hiring for roles that need your product?</li>
+        <li>Are they actively researching similar tools?</li>
+        <li>Are they growing or expanding?</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-title"><span>03</span> Every lead gets a score (1–10)</div>
+    <div class="step-body">
+      <ul>
+        <li>How long ago they went cold</li>
+        <li>Why they went cold — budget constraint vs. rejected</li>
+        <li>Whether a budget was mentioned</li>
+        <li>How engaged they were before going cold</li>
+        <li>Web signals above add up to +3 bonus points</li>
+      </ul>
+      <div class="example">"Went cold 8 months ago due to budget timing. Company just raised Series A. High revival likelihood."</div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-title"><span>04</span> Ranked list for the calling team</div>
+    <div class="step-body">
+      <div class="bands">
+        <div class="band hot"><strong>8–10</strong>HOT — call this week</div>
+        <div class="band warm"><strong>5–7</strong>WARM — call this month</div>
+        <div class="band cold"><strong>1–4</strong>COLD — low priority</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-title"><span>05</span> Stays current automatically</div>
+    <div class="step-body">
+      <p>Every week: fresh web search per lead, entire list re-scored. If a lead's score jumps 3+ points, manager gets an immediate email alert.</p>
+    </div>
+  </div>
+
+  <hr />
+
+  <h2>What the manager sees</h2>
+  <ul>
+    <li>Dashboard with ranked lead table — Hot / Warm / Cold counts at the top</li>
+    <li>Click any lead: score breakdown, web signals found, reason in plain English</li>
+    <li>Weekly email digest: top 10 hot leads every Monday</li>
+    <li>Instant alert when a lead's score spikes</li>
+    <li>Export to CSV for the calling team</li>
+  </ul>
+
+  <hr />
+
+  <h2>What this is NOT (yet)</h2>
+  <ul>
+    <li>Not sending WhatsApp messages or emails to leads — Phase 2</li>
+    <li>Not generating call scripts or proposals — Phase 2</li>
+    <li>Not live call transcription or conversation intelligence — future</li>
+  </ul>
+  <p>Phase 1 is purely: score the leads, surface the best ones, keep it current.</p>
+
+  <hr />
+
+  <h2>Tech — one line</h2>
+  <div class="tech-line">
+    CRM pulls leads → <span>Tavily</span> searches web per lead → <span>Claude AI</span> scores using a rubric → dashboard shows ranked results → <span>Resend</span> emails weekly digest
+  </div>
+
+  <h2>Go-to-market</h2>
+  <p>Pilot on our own sales team first. Recover 10–15 dead leads into paying customers. Use that as the case study. Then sell to other sales teams with proof: <em>"We recovered ₹X from leads we'd already written off."</em></p>
+
+  <div class="footer">
+    <span>ReviveIQ — Confidential</span>
+    <span>amishanegi.work@gmail.com</span>
+  </div>
+
+</div>
+</body>
+</html>

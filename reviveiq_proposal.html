@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #fff;
+    color: #111;
+    font-size: 10pt;
+    line-height: 1.6;
+  }
+
+  /* PAGE */
+  .page {
+    width: 210mm;
+    min-height: 297mm;
+    padding: 18mm 20mm 16mm;
+    page-break-after: always;
+    position: relative;
+  }
+  .page:last-child { page-break-after: auto; }
+
+  /* TOP BAR */
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 2px solid #111;
+    padding-bottom: 12px;
+    margin-bottom: 28px;
+  }
+  .logo {
+    font-size: 16pt;
+    font-weight: 900;
+    letter-spacing: -0.5px;
+    color: #111;
+  }
+  .logo span { color: #00b87a; }
+  .tagline {
+    font-size: 8pt;
+    color: #888;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+  }
+
+  /* HERO BLOCK */
+  .hero {
+    background: #0d0d0d;
+    border-radius: 10px;
+    padding: 28px 32px;
+    margin-bottom: 24px;
+    color: #fff;
+  }
+  .hero-label {
+    font-size: 7.5pt;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #00b87a;
+    margin-bottom: 10px;
+  }
+  .hero h1 {
+    font-size: 22pt;
+    font-weight: 900;
+    line-height: 1.1;
+    letter-spacing: -0.8px;
+    margin-bottom: 12px;
+  }
+  .hero h1 em { font-style: normal; color: #00b87a; }
+  .hero p {
+    font-size: 10pt;
+    color: rgba(255,255,255,0.6);
+    max-width: 480px;
+    line-height: 1.65;
+  }
+
+  /* STATS ROW */
+  .stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .stat {
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 14px 16px;
+    text-align: center;
+  }
+  .stat-num {
+    font-size: 20pt;
+    font-weight: 900;
+    color: #00b87a;
+    letter-spacing: -1px;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .stat-label { font-size: 8pt; color: #6b7280; font-weight: 500; }
+
+  /* SECTION */
+  h2 {
+    font-size: 11pt;
+    font-weight: 800;
+    letter-spacing: -0.2px;
+    margin-bottom: 10px;
+    margin-top: 20px;
+    color: #111;
+  }
+  h2:first-of-type { margin-top: 0; }
+
+  /* TWO COL */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+  .col-block {
+    border-radius: 8px;
+    padding: 16px;
+  }
+  .col-block.red-bg { background: #fff5f5; border: 1px solid #fecaca; }
+  .col-block.green-bg { background: #f0fdf9; border: 1px solid #a7f3d0; }
+  .col-label {
+    font-size: 7.5pt;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .col-label.red { color: #dc2626; }
+  .col-label.green { color: #059669; }
+  .col-block ul { list-style: none; }
+  .col-block li {
+    font-size: 9pt;
+    color: #374151;
+    padding: 5px 0;
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+    display: flex;
+    gap: 8px;
+    line-height: 1.4;
+  }
+  .col-block li:last-child { border-bottom: none; }
+  .col-block li::before { flex-shrink: 0; margin-top: 1px; }
+  .col-block.red-bg li::before { content: '✕'; color: #dc2626; font-size: 8pt; }
+  .col-block.green-bg li::before { content: '✓'; color: #059669; font-size: 8pt; }
+
+  /* HOW IT WORKS */
+  .steps {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .step {
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 12px 12px 14px;
+  }
+  .step-num {
+    font-size: 18pt;
+    font-weight: 900;
+    color: #00b87a;
+    opacity: 0.5;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .step h3 { font-size: 8.5pt; font-weight: 700; margin-bottom: 4px; }
+  .step p { font-size: 8pt; color: #6b7280; line-height: 1.45; }
+
+  /* DIVIDER */
+  .divider {
+    height: 1px;
+    background: #e5e7eb;
+    margin: 20px 0;
+  }
+
+  /* PAGE 2 */
+  .section-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+  .info-block {
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .info-block-header {
+    background: #f9fafb;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 9px 14px;
+    font-size: 8pt;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: #6b7280;
+  }
+  .info-block-body { padding: 12px 14px; }
+  .info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 5px 0;
+    border-bottom: 1px solid #f3f4f6;
+    font-size: 8.5pt;
+  }
+  .info-row:last-child { border-bottom: none; }
+  .info-row-label { color: #6b7280; }
+  .info-row-val { font-weight: 600; color: #111; }
+  .info-row-val.teal { color: #00b87a; }
+
+  /* SCORING VISUAL */
+  .score-bands {
+    display: flex;
+    gap: 6px;
+    margin: 10px 0 16px;
+  }
+  .score-band {
+    flex: 1;
+    border-radius: 6px;
+    padding: 10px 8px;
+    text-align: center;
+  }
+  .score-band .band-score { font-size: 14pt; font-weight: 900; line-height: 1; margin-bottom: 3px; }
+  .score-band .band-label { font-size: 7.5pt; font-weight: 700; letter-spacing: 0.5px; }
+  .score-band .band-action { font-size: 7pt; margin-top: 3px; opacity: 0.7; }
+  .band-hot { background: #f0fdf4; }
+  .band-hot .band-score { color: #16a34a; }
+  .band-hot .band-label { color: #15803d; }
+  .band-warm { background: #fffbeb; }
+  .band-warm .band-score { color: #d97706; }
+  .band-warm .band-label { color: #b45309; }
+  .band-cold { background: #fef2f2; }
+  .band-cold .band-score { color: #dc2626; }
+  .band-cold .band-label { color: #b91c1c; }
+
+  /* PHASES */
+  .phase-list { margin-bottom: 16px; }
+  .phase-item {
+    display: flex;
+    gap: 12px;
+    padding: 8px 0;
+    border-bottom: 1px solid #f3f4f6;
+    align-items: flex-start;
+  }
+  .phase-item:last-child { border-bottom: none; }
+  .phase-dot {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #00b87a;
+    color: #fff;
+    font-size: 8pt;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .phase-dot.gray { background: #e5e7eb; color: #9ca3af; }
+  .phase-text h4 { font-size: 9pt; font-weight: 700; margin-bottom: 2px; }
+  .phase-text p { font-size: 8pt; color: #6b7280; }
+
+  /* CTA BOX */
+  .cta-box {
+    background: #0d0d0d;
+    border-radius: 10px;
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+  }
+  .cta-box h3 { font-size: 12pt; font-weight: 800; color: #fff; margin-bottom: 4px; }
+  .cta-box p { font-size: 8.5pt; color: rgba(255,255,255,0.5); }
+  .cta-contact { text-align: right; flex-shrink: 0; }
+  .cta-contact p { font-size: 8.5pt; color: rgba(255,255,255,0.4); margin-bottom: 2px; }
+  .cta-contact strong { font-size: 9.5pt; color: #00b87a; font-weight: 700; }
+
+  /* FOOTER */
+  .footer {
+    position: absolute;
+    bottom: 12mm;
+    left: 20mm;
+    right: 20mm;
+    display: flex;
+    justify-content: space-between;
+    font-size: 7.5pt;
+    color: #d1d5db;
+    border-top: 1px solid #f3f4f6;
+    padding-top: 8px;
+  }
+
+  @media print {
+    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ════════════ PAGE 1 ════════════ -->
+<div class="page">
+
+  <div class="topbar">
+    <div class="logo">Revive<span>IQ</span></div>
+    <div class="tagline">Confidential · April 2026</div>
+  </div>
+
+  <div class="hero">
+    <div class="hero-label">Product Proposal</div>
+    <h1>Your dead leads are<br /><em>revenue waiting</em> to be unlocked.</h1>
+    <p>ReviveIQ is an AI-powered engine that scores your cold leads by revival likelihood — so your calling team always knows who to call first, and why.</p>
+  </div>
+
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-num">1,000+</div>
+      <div class="stat-label">Dead leads in the average sales database</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">3–5×</div>
+      <div class="stat-label">Higher conversion on warm vs cold calls</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">₹0</div>
+      <div class="stat-label">Extra spend to recover leads you already paid for</div>
+    </div>
+  </div>
+
+  <h2>The problem every sales team has</h2>
+  <div class="two-col">
+    <div class="col-block red-bg">
+      <div class="col-label red">Today — without ReviveIQ</div>
+      <ul>
+        <li>1,000+ dead leads dumped with zero priority</li>
+        <li>Agents call cold with no context or brief</li>
+        <li>Hot leads buried at the bottom of the list</li>
+        <li>Leads slip through — never contacted at all</li>
+        <li>Revenue leaks every month, silently</li>
+      </ul>
+    </div>
+    <div class="col-block green-bg">
+      <div class="col-label green">With ReviveIQ</div>
+      <ul>
+        <li>Every lead scored 1–10 by AI, ranked instantly</li>
+        <li>Score reason tells agent exactly why to call</li>
+        <li>Hot leads surface to the top automatically</li>
+        <li>Weekly re-score keeps the list current</li>
+        <li>Recovered revenue from leads already acquired</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>How it works</h2>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">01</div>
+      <h3>Connect your CRM</h3>
+      <p>HubSpot, Salesforce, Pipedrive, Zoho, Teamgate. Dead leads pull in automatically.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">02</div>
+      <h3>AI scans the web</h3>
+      <p>Live search for funding rounds, hiring signals, and intent data per lead.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">03</div>
+      <h3>Every lead scored</h3>
+      <p>Revival score 1–10 with a plain-English reason for the score.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">04</div>
+      <h3>Team calls in order</h3>
+      <p>Hottest leads at the top. Manager sees ranked list. No guesswork.</p>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span>ReviveIQ — Confidential</span>
+    <span>Page 1 of 2</span>
+  </div>
+</div>
+
+<!-- ════════════ PAGE 2 ════════════ -->
+<div class="page">
+
+  <div class="topbar">
+    <div class="logo">Revive<span>IQ</span></div>
+    <div class="tagline">Confidential · April 2026</div>
+  </div>
+
+  <h2>The scoring model</h2>
+  <p style="font-size:9pt; color:#6b7280; margin-bottom:10px;">Each lead is scored across four dimensions using CRM history, then boosted by live web intelligence. Fully transparent — every score comes with a reason.</p>
+
+  <div class="score-bands">
+    <div class="score-band band-hot">
+      <div class="band-score">8–10</div>
+      <div class="band-label">HOT</div>
+      <div class="band-action">Call this week</div>
+    </div>
+    <div class="score-band band-warm">
+      <div class="band-score">5–7</div>
+      <div class="band-label">WARM</div>
+      <div class="band-action">Call this month</div>
+    </div>
+    <div class="score-band band-cold">
+      <div class="band-score">1–4</div>
+      <div class="band-label">COLD</div>
+      <div class="band-action">Low priority</div>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    <div class="info-block">
+      <div class="info-block-header">Scoring dimensions</div>
+      <div class="info-block-body">
+        <div class="info-row"><span class="info-row-label">Recency — how long ago cold</span><span class="info-row-val teal">0–3 pts</span></div>
+        <div class="info-row"><span class="info-row-label">Cold reason — budget vs rejected</span><span class="info-row-val teal">0–2 pts</span></div>
+        <div class="info-row"><span class="info-row-label">Budget signal — amount mentioned</span><span class="info-row-val teal">0–2 pts</span></div>
+        <div class="info-row"><span class="info-row-label">Engagement — demo'd, was close</span><span class="info-row-val teal">0–1 pt</span></div>
+        <div class="info-row"><span class="info-row-label">Web boost — funding / intent signals</span><span class="info-row-val teal">+0–3 pts</span></div>
+      </div>
+    </div>
+    <div class="info-block">
+      <div class="info-block-header">Web intelligence signals (live)</div>
+      <div class="info-block-body">
+        <div class="info-row"><span class="info-row-label">💰 Funding raised recently</span><span class="info-row-val teal">+2</span></div>
+        <div class="info-row"><span class="info-row-label">🎯 Evaluating similar tools now</span><span class="info-row-val teal">+2</span></div>
+        <div class="info-row"><span class="info-row-label">👥 Hiring for relevant roles</span><span class="info-row-val teal">+1</span></div>
+        <div class="info-row"><span class="info-row-label">🔍 Reviewed G2 / Capterra</span><span class="info-row-val teal">+1</span></div>
+        <div class="info-row"><span class="info-row-label">📈 Company expanding / growing</span><span class="info-row-val teal">+1</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <h2>Build plan — 4 phases</h2>
+  <div class="phase-list">
+    <div class="phase-item">
+      <div class="phase-dot">1</div>
+      <div class="phase-text">
+        <h4>Foundation — Auth + Database persistence</h4>
+        <p>Clerk login, Supabase database. Leads and scores saved permanently. Per-user data isolation.</p>
+      </div>
+    </div>
+    <div class="phase-item">
+      <div class="phase-dot">2</div>
+      <div class="phase-text">
+        <h4>Scoring engine — Python FastAPI pipeline</h4>
+        <p>Parallel enrichment (Tavily) + scoring (Claude AI) for 1,000+ leads in under 30 seconds.</p>
+      </div>
+    </div>
+    <div class="phase-item">
+      <div class="phase-dot">3</div>
+      <div class="phase-text">
+        <h4>Automation — Weekly re-score + email alerts</h4>
+        <p>Leads re-scored every week with fresh web data. Manager gets digest + instant alerts when scores jump.</p>
+      </div>
+    </div>
+    <div class="phase-item">
+      <div class="phase-dot gray">4</div>
+      <div class="phase-text">
+        <h4>Calling AI — Warm-up messages + call briefs (later)</h4>
+        <p>Automated WhatsApp, personalised call briefs, auto CRM push after calls. Phase 2 of the product.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="section-grid" style="margin-bottom:20px;">
+    <div class="info-block">
+      <div class="info-block-header">Pricing model</div>
+      <div class="info-block-body">
+        <div class="info-row"><span class="info-row-label">Free</span><span class="info-row-val">100 leads / month</span></div>
+        <div class="info-row"><span class="info-row-label">Pro</span><span class="info-row-val">1,000 leads / month</span></div>
+        <div class="info-row"><span class="info-row-label">Scale</span><span class="info-row-val">Unlimited</span></div>
+        <div class="info-row"><span class="info-row-label">Strategy</span><span class="info-row-val teal">% of recovered revenue</span></div>
+      </div>
+    </div>
+    <div class="info-block">
+      <div class="info-block-header">Go-to-market</div>
+      <div class="info-block-body">
+        <div class="info-row"><span class="info-row-label">Pilot</span><span class="info-row-val">Own sales team first</span></div>
+        <div class="info-row"><span class="info-row-label">Target</span><span class="info-row-val">Recover 10–15 deals</span></div>
+        <div class="info-row"><span class="info-row-label">Then</span><span class="info-row-val">Case study → outbound</span></div>
+        <div class="info-row"><span class="info-row-label">ICP</span><span class="info-row-val teal">Sales teams, 50–500 leads</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cta-box">
+    <div>
+      <h3>Interested in early access?</h3>
+      <p>We onboard the first 50 teams personally. No credit card. Built for sales teams that want to stop leaving money on the table.</p>
+    </div>
+    <div class="cta-contact">
+      <p>Get in touch</p>
+      <strong>amishanegi.work@gmail.com</strong>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span>ReviveIQ — Confidential</span>
+    <span>Page 2 of 2</span>
+  </div>
+</div>
+
+</body>
+</html>

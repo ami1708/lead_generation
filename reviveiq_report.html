@@ -1,0 +1,1581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ReviveIQ — Full Implementation Report</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --teal: #00c896;
+    --teal-light: #e6fff9;
+    --dark: #0f1117;
+    --text: #1a1d29;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+    --surface: #f9fafb;
+    --accent-bg: #f0fdf9;
+    --red: #ef4444;
+    --yellow: #f59e0b;
+    --blue: #3b82f6;
+    --purple: #8b5cf6;
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    color: var(--text);
+    background: #fff;
+    font-size: 10.5pt;
+    line-height: 1.65;
+  }
+
+  /* ── Cover page ── */
+  .cover {
+    min-height: 100vh;
+    background: var(--dark);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 72px 80px;
+    page-break-after: always;
+    position: relative;
+    overflow: hidden;
+  }
+  .cover::before {
+    content: '';
+    position: absolute;
+    top: -200px; left: 50%;
+    transform: translateX(-50%);
+    width: 900px; height: 600px;
+    background: radial-gradient(ellipse, rgba(0,200,150,0.12) 0%, transparent 65%);
+    pointer-events: none;
+  }
+  .cover-logo {
+    font-size: 22pt;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: -0.5px;
+    position: relative;
+  }
+  .cover-logo span { color: var(--teal); }
+  .cover-center { position: relative; }
+  .cover-tag {
+    display: inline-block;
+    background: rgba(0,200,150,0.12);
+    border: 1px solid rgba(0,200,150,0.3);
+    color: var(--teal);
+    font-size: 8pt;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 6px 14px;
+    border-radius: 4px;
+    margin-bottom: 28px;
+  }
+  .cover h1 {
+    font-size: 40pt;
+    font-weight: 900;
+    color: #fff;
+    line-height: 1.05;
+    letter-spacing: -1.5px;
+    margin-bottom: 24px;
+  }
+  .cover h1 em {
+    font-style: normal;
+    color: var(--teal);
+  }
+  .cover-sub {
+    font-size: 12pt;
+    color: rgba(255,255,255,0.5);
+    max-width: 520px;
+    line-height: 1.6;
+  }
+  .cover-meta {
+    display: flex;
+    gap: 48px;
+    position: relative;
+  }
+  .cover-meta-item label {
+    display: block;
+    font-size: 7.5pt;
+    color: rgba(255,255,255,0.35);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+  }
+  .cover-meta-item p {
+    font-size: 10pt;
+    color: rgba(255,255,255,0.75);
+    font-weight: 500;
+  }
+
+  /* ── TOC ── */
+  .toc-page {
+    padding: 72px 80px;
+    page-break-after: always;
+  }
+  .toc-page h2 {
+    font-size: 22pt;
+    font-weight: 800;
+    margin-bottom: 36px;
+    letter-spacing: -0.5px;
+  }
+  .toc-list { list-style: none; }
+  .toc-list li {
+    display: flex;
+    align-items: baseline;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 10.5pt;
+  }
+  .toc-list li:last-child { border-bottom: none; }
+  .toc-num {
+    font-size: 8pt;
+    font-weight: 700;
+    color: var(--teal);
+    width: 32px;
+    flex-shrink: 0;
+  }
+  .toc-title { flex: 1; font-weight: 500; }
+  .toc-dots { flex: 1; border-bottom: 1px dotted #d1d5db; margin: 0 12px; position: relative; top: -4px; }
+  .toc-page-num { font-size: 9pt; color: var(--muted); font-weight: 500; }
+  .toc-section {
+    font-size: 8pt;
+    font-weight: 700;
+    color: var(--muted);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 20px 0 8px;
+  }
+
+  /* ── Content pages ── */
+  .page {
+    padding: 64px 80px;
+    page-break-after: always;
+    position: relative;
+  }
+  .page:last-child { page-break-after: auto; }
+
+  /* ── Section header ── */
+  .section-num {
+    font-size: 8pt;
+    font-weight: 700;
+    color: var(--teal);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  h2.section-title {
+    font-size: 24pt;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    margin-bottom: 8px;
+    line-height: 1.1;
+  }
+  .section-desc {
+    font-size: 10.5pt;
+    color: var(--muted);
+    max-width: 600px;
+    margin-bottom: 36px;
+    line-height: 1.65;
+  }
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin-bottom: 36px;
+  }
+
+  /* ── Headings ── */
+  h3 {
+    font-size: 13pt;
+    font-weight: 700;
+    margin: 32px 0 12px;
+    letter-spacing: -0.2px;
+  }
+  h3:first-child { margin-top: 0; }
+  h4 {
+    font-size: 10.5pt;
+    font-weight: 700;
+    margin: 20px 0 8px;
+    color: var(--text);
+  }
+
+  p { margin-bottom: 12px; }
+  p:last-child { margin-bottom: 0; }
+
+  /* ── Tables ── */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0 24px;
+    font-size: 9.5pt;
+  }
+  thead tr {
+    background: var(--surface);
+    border-bottom: 2px solid var(--border);
+  }
+  thead th {
+    padding: 10px 14px;
+    text-align: left;
+    font-weight: 700;
+    font-size: 8.5pt;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--muted);
+  }
+  tbody tr { border-bottom: 1px solid var(--border); }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: var(--surface); }
+  tbody td {
+    padding: 10px 14px;
+    vertical-align: top;
+  }
+  .td-mono { font-family: 'JetBrains Mono', monospace; font-size: 8.5pt; color: #374151; }
+  .td-teal { color: var(--teal); font-weight: 600; }
+  .td-muted { color: var(--muted); }
+
+  /* ── Code blocks ── */
+  .code-block {
+    background: #1a1d29;
+    border-radius: 8px;
+    padding: 20px 24px;
+    margin: 16px 0 24px;
+    overflow-x: auto;
+  }
+  .code-block pre {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8.5pt;
+    line-height: 1.7;
+    color: #e2e8f0;
+    white-space: pre;
+  }
+  .code-block .c { color: #6b7280; }
+  .code-block .k { color: #c084fc; }
+  .code-block .s { color: #86efac; }
+  .code-block .t { color: #67e8f9; }
+  .code-block .n { color: #fbbf24; }
+
+  /* ── Callout boxes ── */
+  .callout {
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin: 16px 0;
+    border-left: 3px solid;
+    font-size: 10pt;
+  }
+  .callout-teal { background: var(--accent-bg); border-color: var(--teal); }
+  .callout-yellow { background: #fffbeb; border-color: var(--yellow); }
+  .callout-red { background: #fef2f2; border-color: var(--red); }
+  .callout-blue { background: #eff6ff; border-color: var(--blue); }
+  .callout-purple { background: #f5f3ff; border-color: var(--purple); }
+  .callout strong { font-weight: 700; display: block; margin-bottom: 4px; }
+
+  /* ── Score rubric ── */
+  .score-row {
+    display: flex;
+    align-items: center;
+    padding: 10px 14px;
+    border-radius: 6px;
+    margin-bottom: 6px;
+    font-size: 9.5pt;
+  }
+  .score-dim { font-weight: 700; width: 160px; flex-shrink: 0; }
+  .score-cond { flex: 1; color: var(--muted); }
+  .score-pts {
+    font-weight: 800;
+    font-size: 11pt;
+    width: 48px;
+    text-align: right;
+  }
+  .score-section-label {
+    font-size: 8pt;
+    font-weight: 700;
+    color: var(--muted);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 16px 14px 6px;
+  }
+
+  /* ── Flow diagram ── */
+  .flow {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin: 20px 0;
+  }
+  .flow-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  .flow-line-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 36px;
+    flex-shrink: 0;
+  }
+  .flow-dot {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--teal);
+    color: #fff;
+    font-size: 9pt;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .flow-connector {
+    width: 2px;
+    flex: 1;
+    min-height: 20px;
+    background: var(--border);
+    margin: 4px 0;
+  }
+  .flow-content {
+    padding: 6px 0 24px;
+    flex: 1;
+  }
+  .flow-content h4 { margin: 0 0 4px; }
+  .flow-content p { margin: 0; color: var(--muted); font-size: 9.5pt; }
+
+  /* ── Badge ── */
+  .badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 4px;
+    font-size: 8pt;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+  }
+  .badge-teal { background: var(--teal-light); color: #065f46; }
+  .badge-yellow { background: #fef3c7; color: #92400e; }
+  .badge-red { background: #fee2e2; color: #991b1b; }
+  .badge-blue { background: #dbeafe; color: #1e40af; }
+  .badge-purple { background: #ede9fe; color: #5b21b6; }
+  .badge-gray { background: #f3f4f6; color: #374151; }
+
+  /* ── Phase timeline ── */
+  .phase-block {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+  .phase-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 20px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+  }
+  .phase-num {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--teal);
+    color: #fff;
+    font-weight: 800;
+    font-size: 11pt;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .phase-title { font-weight: 700; font-size: 11pt; flex: 1; }
+  .phase-body { padding: 16px 20px; }
+  .phase-body ul { list-style: none; }
+  .phase-body li {
+    padding: 7px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 9.5pt;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .phase-body li:last-child { border-bottom: none; }
+  .phase-body li::before {
+    content: '→';
+    color: var(--teal);
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  /* ── Agent card ── */
+  .agent-card {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+  .agent-header {
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .agent-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+  .agent-name { font-weight: 700; font-size: 11pt; }
+  .agent-trigger { font-size: 8.5pt; color: var(--muted); margin-top: 2px; }
+  .agent-body {
+    padding: 0 20px 16px;
+    font-size: 9.5pt;
+  }
+  .agent-row {
+    display: flex;
+    gap: 12px;
+    padding: 8px 0;
+    border-top: 1px solid var(--border);
+  }
+  .agent-row-label {
+    font-weight: 700;
+    width: 70px;
+    flex-shrink: 0;
+    color: var(--muted);
+    font-size: 8.5pt;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding-top: 1px;
+  }
+  .agent-row-val { flex: 1; color: var(--text); line-height: 1.55; }
+
+  /* ── DB Schema ── */
+  .schema-table {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 20px;
+    font-size: 9pt;
+  }
+  .schema-table-header {
+    background: #1a1d29;
+    color: #fff;
+    padding: 10px 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 600;
+    font-size: 9.5pt;
+    letter-spacing: 0.5px;
+  }
+  .schema-table-header span { color: var(--teal); }
+  .schema-row {
+    display: flex;
+    border-top: 1px solid var(--border);
+    align-items: baseline;
+  }
+  .schema-row:first-child { border-top: none; }
+  .schema-col-name {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 600;
+    padding: 9px 16px;
+    width: 180px;
+    flex-shrink: 0;
+    font-size: 8.5pt;
+    color: #1e40af;
+  }
+  .schema-col-type {
+    font-family: 'JetBrains Mono', monospace;
+    padding: 9px 0;
+    width: 110px;
+    flex-shrink: 0;
+    font-size: 8.5pt;
+    color: #7c3aed;
+  }
+  .schema-col-desc {
+    padding: 9px 16px;
+    flex: 1;
+    color: var(--muted);
+    font-size: 8.5pt;
+    line-height: 1.5;
+  }
+  .schema-pk {
+    display: inline-block;
+    background: #fef3c7;
+    color: #92400e;
+    font-size: 7pt;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 3px;
+    margin-left: 6px;
+  }
+  .schema-fk {
+    display: inline-block;
+    background: #dbeafe;
+    color: #1e40af;
+    font-size: 7pt;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 3px;
+    margin-left: 6px;
+  }
+
+  /* ── 2-col grid ── */
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin: 16px 0;
+  }
+  .grid-3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+    margin: 16px 0;
+  }
+  .stat-card {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 18px;
+  }
+  .stat-num {
+    font-size: 26pt;
+    font-weight: 900;
+    color: var(--teal);
+    line-height: 1;
+    margin-bottom: 6px;
+    letter-spacing: -1px;
+  }
+  .stat-label { font-size: 9pt; color: var(--muted); font-weight: 500; }
+
+  /* ── Footer ── */
+  .page-footer {
+    position: fixed;
+    bottom: 32px;
+    left: 80px;
+    right: 80px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 8pt;
+    color: #d1d5db;
+    border-top: 1px solid #f3f4f6;
+    padding-top: 10px;
+  }
+
+  /* ── Print ── */
+  @media print {
+    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .page { page-break-after: always; }
+    .no-break { page-break-inside: avoid; }
+  }
+
+  ul.plain { list-style: none; }
+  ul.plain li {
+    padding: 6px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 9.5pt;
+    display: flex;
+    gap: 10px;
+  }
+  ul.plain li::before { content: '·'; color: var(--teal); font-weight: 900; flex-shrink: 0; }
+  ul.plain li:last-child { border-bottom: none; }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════ COVER ══ -->
+<div class="cover">
+  <div class="cover-logo">Revive<span>IQ</span></div>
+  <div class="cover-center">
+    <div class="cover-tag">Implementation Report &nbsp;·&nbsp; v1.0</div>
+    <h1>Turn dead leads into<br /><em>recovered revenue.</em></h1>
+    <p class="cover-sub">Full architecture, scoring model, AI agent design, database schema, and phased build plan for the ReviveIQ platform.</p>
+  </div>
+  <div class="cover-meta">
+    <div class="cover-meta-item"><label>Date</label><p>April 17, 2026</p></div>
+    <div class="cover-meta-item"><label>Version</label><p>1.0 — Draft</p></div>
+    <div class="cover-meta-item"><label>Status</label><p>Pre-build</p></div>
+    <div class="cover-meta-item"><label>Author</label><p>ReviveIQ Team</p></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ TOC ══ -->
+<div class="toc-page">
+  <h2>Table of Contents</h2>
+  <ul class="toc-list">
+    <li><div class="toc-section">Overview</div></li>
+    <li><span class="toc-num">01</span><span class="toc-title">Executive Summary</span><span class="toc-dots"></span><span class="toc-page-num">3</span></li>
+    <li><span class="toc-num">02</span><span class="toc-title">Product Vision &amp; Problem Statement</span><span class="toc-dots"></span><span class="toc-page-num">4</span></li>
+    <li><div class="toc-section">Architecture</div></li>
+    <li><span class="toc-num">03</span><span class="toc-title">System Architecture &amp; Tech Stack</span><span class="toc-dots"></span><span class="toc-page-num">5</span></li>
+    <li><span class="toc-num">04</span><span class="toc-title">End-to-End User Flow</span><span class="toc-dots"></span><span class="toc-page-num">6</span></li>
+    <li><span class="toc-num">05</span><span class="toc-title">Database Schema</span><span class="toc-dots"></span><span class="toc-page-num">7</span></li>
+    <li><div class="toc-section">Core Engine</div></li>
+    <li><span class="toc-num">06</span><span class="toc-title">Lead Scoring Model</span><span class="toc-dots"></span><span class="toc-page-num">9</span></li>
+    <li><span class="toc-num">07</span><span class="toc-title">AI Agents Design</span><span class="toc-dots"></span><span class="toc-page-num">11</span></li>
+    <li><span class="toc-num">08</span><span class="toc-title">CRM Integration</span><span class="toc-dots"></span><span class="toc-page-num">13</span></li>
+    <li><div class="toc-section">Product</div></li>
+    <li><span class="toc-num">09</span><span class="toc-title">Scheduling &amp; Data Freshness</span><span class="toc-dots"></span><span class="toc-page-num">14</span></li>
+    <li><span class="toc-num">10</span><span class="toc-title">Notifications &amp; Sales Manager Alerts</span><span class="toc-dots"></span><span class="toc-page-num">15</span></li>
+    <li><span class="toc-num">11</span><span class="toc-title">Dashboard Design</span><span class="toc-dots"></span><span class="toc-page-num">16</span></li>
+    <li><span class="toc-num">12</span><span class="toc-title">Monetisation Model</span><span class="toc-dots"></span><span class="toc-page-num">17</span></li>
+    <li><div class="toc-section">Build</div></li>
+    <li><span class="toc-num">13</span><span class="toc-title">Phased Build Plan</span><span class="toc-dots"></span><span class="toc-page-num">18</span></li>
+    <li><span class="toc-num">14</span><span class="toc-title">What Is Already Built</span><span class="toc-dots"></span><span class="toc-page-num">20</span></li>
+    <li><span class="toc-num">15</span><span class="toc-title">Open Decisions &amp; Risks</span><span class="toc-dots"></span><span class="toc-page-num">21</span></li>
+  </ul>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ 01 EXEC SUMMARY ══ -->
+<div class="page">
+  <div class="section-num">01 — Executive Summary</div>
+  <h2 class="section-title">What ReviveIQ does<br />and why it matters.</h2>
+  <p class="section-desc">The one-page version of the entire product, strategy, and plan.</p>
+  <div class="divider"></div>
+
+  <div class="grid-3">
+    <div class="stat-card"><div class="stat-num">1,000+</div><div class="stat-label">Dead leads in the average sales database</div></div>
+    <div class="stat-card"><div class="stat-num">3–5×</div><div class="stat-label">Higher conversion on warm vs cold outreach</div></div>
+    <div class="stat-card"><div class="stat-num">₹0</div><div class="stat-label">Extra spend to recover leads already acquired</div></div>
+  </div>
+
+  <h3>The problem</h3>
+  <p>Every sales team accumulates hundreds of leads who went cold — budget constraints, wrong timing, team restructuring. Every few months someone dumps the entire list on the calling team with no priority, no context, and no strategy. Agents call cold, in random order. Most leads are never contacted at all. Revenue quietly leaks.</p>
+
+  <h3>What ReviveIQ does</h3>
+  <p>ReviveIQ connects to your CRM, pulls all inactive/dead leads, and runs each one through an AI scoring pipeline that combines CRM history with live web intelligence (funding rounds, hiring signals, intent data). Every lead gets a revival score from 1–10 with a plain-English explanation. The calling team sees a ranked list — hottest leads at the top — and knows exactly who to call first and why.</p>
+
+  <h3>Build strategy</h3>
+  <p>The builder's own sales business is the pilot. Once ReviveIQ recovers 10–15 leads into paying customers internally, that becomes the case study used to sell to other sales teams. The positioning is not "buy more software" — it is "recover revenue from leads you already paid to acquire."</p>
+
+  <div class="callout callout-teal">
+    <strong>Phase 1 focus (now)</strong>
+    Lead scoring engine + metrics dashboard. Everything else — warm-up messages, call briefs, proposals — is Phase 2 and beyond. Nail the score first.
+  </div>
+
+  <h3>Backend split decision</h3>
+  <p>The web layer (auth, CRM connection, dashboard API) runs on <strong>Next.js API Routes</strong> deployed to Vercel. The AI batch processing pipeline runs on a separate <strong>Python FastAPI</strong> service (Railway/Render) because scoring 1,000 leads in parallel will exceed Vercel's serverless timeout. Both services share one <strong>Supabase (Postgres)</strong> database.</p>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ 02 VISION ══ -->
+<div class="page">
+  <div class="section-num">02 — Product Vision</div>
+  <h2 class="section-title">Problem, solution,<br />and what we are not building.</h2>
+  <p class="section-desc">Clarity on scope prevents scope creep.</p>
+  <div class="divider"></div>
+
+  <h3>Current workflow (the pilot business)</h3>
+  <div class="flow">
+    <div class="flow-step">
+      <div class="flow-line-col"><div class="flow-dot">1</div><div class="flow-connector"></div></div>
+      <div class="flow-content"><h4>Cron job runs every 6 months</h4><p>Copies old/inactive leads from main DB into a separate calling team table. No filtering, no prioritisation — all 1,000+ dumped at once.</p></div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-line-col"><div class="flow-dot">2</div><div class="flow-connector"></div></div>
+      <div class="flow-content"><h4>Calling team contacts leads cold</h4><p>No brief, no context, no idea who is warm. Agents call in random order. Generic "just checking in" openers. Low pick-up and conversion rates.</p></div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-line-col"><div class="flow-dot">3</div><div class="flow-connector"></div></div>
+      <div class="flow-content"><h4>Interested leads manually re-entered</h4><p>If someone shows interest, the agent manually adds them back to the main CRM pipeline. High error rate, context lost in transfer.</p></div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-line-col"><div class="flow-dot">!</div></div>
+      <div class="flow-content"><h4>Leads slip through constantly</h4><p>No watchdog. Leads that were never contacted in a batch are silently ignored until the next 6-month cycle. Hot leads go cold again.</p></div>
+    </div>
+  </div>
+
+  <h3>What ReviveIQ fixes in Phase 1</h3>
+  <table>
+    <thead><tr><th>Problem</th><th>ReviveIQ solution</th></tr></thead>
+    <tbody>
+      <tr><td>No prioritisation — 1,000 leads dumped flat</td><td>Every lead scored 1–10, ranked by revival likelihood</td></tr>
+      <tr><td>Agents call cold with no context</td><td>Score reason tells agent exactly why this lead is worth calling</td></tr>
+      <tr><td>Hot leads buried at bottom of list</td><td>Hot tier (8–10) surfaced immediately, visible to manager</td></tr>
+      <tr><td>No visibility on what was contacted</td><td>Dashboard shows full batch status, who was scored, when</td></tr>
+      <tr><td>Results lost after each batch run</td><td>All scores stored in DB — history kept, trends visible over time</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Explicit out of scope (Phase 1)</h3>
+  <ul class="plain">
+    <li>Automated WhatsApp / email warm-up before calls</li>
+    <li>AI-generated call briefs and talking points</li>
+    <li>Live call conversation intelligence</li>
+    <li>Auto CRM push after a call completes</li>
+    <li>Instant proposal generation during a call</li>
+    <li>LinkedIn enrichment (requires paid third-party API)</li>
+    <li>Website visitor tracking pixel</li>
+    <li>Multi-user teams / role-based access within one account</li>
+    <li>Mobile app</li>
+  </ul>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ 03 ARCHITECTURE ══ -->
+<div class="page">
+  <div class="section-num">03 — System Architecture</div>
+  <h2 class="section-title">Tech stack and<br />how the pieces connect.</h2>
+  <p class="section-desc">Two services, one database. Clear separation between web layer and AI pipeline.</p>
+  <div class="divider"></div>
+
+  <h3>Architecture diagram</h3>
+  <div class="code-block"><pre>
+┌──────────────────────────────────────────────────────────────────────┐
+│                         USER / BROWSER                               │
+└──────────────────────┬───────────────────────────────────────────────┘
+                       │ HTTPS
+┌──────────────────────▼───────────────────────────────────────────────┐
+│              NEXT.JS FRONTEND  (Vercel)                              │
+│   /app/page.tsx          Landing page + waitlist                     │
+│   /app/dashboard/*       Authenticated dashboard (Clerk)             │
+│   /app/api/crm           CRM connect + lead fetch                    │
+│   /app/api/waitlist      Early access signups                        │
+│   /app/api/leads         CRUD — reads from Supabase                  │
+└──────────────┬───────────────────────┬───────────────────────────────┘
+               │ Clerk JWT             │ REST
+               │                      │
+┌──────────────▼──────────┐  ┌─────────▼──────────────────────────────┐
+│   SUPABASE (Postgres)   │  │   PYTHON FASTAPI  (Railway / Render)   │
+│                         │  │                                         │
+│   users                 │  │   POST /batch/score                     │
+│   crm_connections        │  │     → pull leads from Supabase         │
+│   leads                 │  │     → run Enrichment Agent (Tavily)    │
+│   lead_scores           │  │     → run Scoring Agent (Claude)       │
+│   batches               │  │     → write scores to Supabase         │
+│   usage                 │  │                                         │
+│                         │  │   POST /batch/sync-crm                 │
+└─────────────────────────┘  │     → called by Vercel Cron weekly     │
+                              │                                         │
+                              │   Dependencies:                         │
+                              │     anthropic SDK (Python)              │
+                              │     tavily-python                       │
+                              │     supabase-py                         │
+                              │     fastapi + uvicorn                   │
+└─────────────────────────────────────────────────────────────────────┘
+  </pre></div>
+
+  <h3>Tech stack decisions</h3>
+  <table>
+    <thead><tr><th>Layer</th><th>Tool</th><th>Decision rationale</th></tr></thead>
+    <tbody>
+      <tr><td>Frontend + web API</td><td><strong>Next.js 16 App Router</strong></td><td>Already in use. Vercel deployment. API routes handle auth, CRM connect, dashboard data reads.</td></tr>
+      <tr><td>Auth</td><td><strong>Clerk</strong></td><td>Fastest integration with App Router. Handles OAuth, magic links, JWT sessions. Free tier covers pilot phase.</td></tr>
+      <tr><td>Database</td><td><strong>Supabase (Postgres)</strong></td><td>Managed Postgres + row-level security + real-time subscriptions + storage. Free tier sufficient. Single platform.</td></tr>
+      <tr><td>AI batch pipeline</td><td><strong>Python FastAPI</strong></td><td>No Vercel timeout constraints. Python anthropic SDK more ergonomic for agent orchestration. async/await parallelism for 1,000+ leads.</td></tr>
+      <tr><td>AI model</td><td><strong>Claude Haiku 4.5</strong></td><td>~$0.001 per lead scored. Fast (1–2s per call). Sufficient reasoning quality for structured scoring rubric. Haiku 4.5 is latest.</td></tr>
+      <tr><td>Web enrichment</td><td><strong>Tavily</strong></td><td>Already integrated. Live web search designed for AI agents. 1,000 free searches/month covers pilot. 5 parallel searches per lead.</td></tr>
+      <tr><td>Email</td><td><strong>Resend</strong></td><td>Already wired in codebase. Simple API, generous free tier, excellent deliverability.</td></tr>
+      <tr><td>Scheduling</td><td><strong>Vercel Cron</strong></td><td>Zero infra overhead. Calls internal Next.js API route weekly which then triggers FastAPI pipeline.</td></tr>
+      <tr><td>Payments</td><td><strong>Stripe</strong></td><td>Industry standard. Built after pilot validates value — not needed for Phase 1.</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ 04 USER FLOW ══ -->
+<div class="page">
+  <div class="section-num">04 — End-to-End User Flow</div>
+  <h2 class="section-title">What happens from<br />signup to scored leads.</h2>
+  <div class="divider"></div>
+
+  <div class="flow">
+    <div class="flow-step">
+      <div class="flow-line-col"><div class="flow-dot">1</div><div class="flow-connector"></div></div>
+      <div class="flow-content"><h4>Landing page — <span class="badge badge-gray">reviveiq.com</span></h4><p>Visitor sees the marketing page. Clicks "Sign up free" or "Get early access". Redirected to Clerk sign-up screen. Email or Google OAuth.</p></div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-line-col"><div class="flow-dot">2</div><div class="flow-connector"></div></div>
+      <div class="flow-content"><h4>Auth — <span class="badge badge-blue">Clerk</span></h4><p>User creates account. Clerk session created. User record written to Supabase <code>users</code> table via Clerk webhook. Redirected to dashboard.</p></div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-line-col"><div class="flow-dot">3</div><div class="flow-connector"></div></div>
+      <div class="flow-content"><h4>Dashboard onboarding — connect CRM</h4><p>First-time user sees prompt to connect their CRM. Selects CRM type, enters API key. Key is AES-256 encrypted and saved to <code>crm_connections</code>. ReviveIQ immediately fetches up to 500 inactive leads and stores them in <code>leads</code> table.</p></div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-line-col"><div class="flow-dot">4</div><div class="flow-connector"></div></div>
+      <div class="flow-content"><h4>Score batch — <span class="badge badge-teal">Python FastAPI</span></h4><p>User clicks "Run scoring". Dashboard calls FastAPI <code>POST /batch/score</code>. Pipeline enriches all leads in parallel via Tavily (5 web searches per lead), then scores all leads in parallel via Claude Haiku. Results written to <code>lead_scores</code>. Batch status updates in real-time via Supabase subscription.</p></div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-line-col"><div class="flow-dot">5</div><div class="flow-connector"></div></div>
+      <div class="flow-content"><h4>Results dashboard</h4><p>Dashboard renders ranked lead table from DB. Hot / Warm / Cold metric cards at top. Clicking a lead opens detail panel: score breakdown, web signals found, score reason. Manager can export CSV for the calling team.</p></div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-line-col"><div class="flow-dot">6</div><div class="flow-connector"></div></div>
+      <div class="flow-content"><h4>Weekly automation — <span class="badge badge-purple">Vercel Cron</span></h4><p>Every Monday at 6am: sync new dead leads from CRM. 7am: re-score all leads with fresh web intelligence. 8am: send email digest to manager — top 10 hot leads + any leads whose score jumped by 3+ points.</p></div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-line-col"><div class="flow-dot">7</div></div>
+      <div class="flow-content"><h4>Calling team acts</h4><p>Manager reviews ranked list. Calls in score order. Hot leads (8–10) first, with score reason giving instant context. No more cold calling blind from a flat list.</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ 05 DB SCHEMA ══ -->
+<div class="page">
+  <div class="section-num">05 — Database Schema</div>
+  <h2 class="section-title">What gets stored,<br />where, and why.</h2>
+  <p class="section-desc">All tables in Supabase (Postgres). Row-level security enabled — users only see their own data.</p>
+  <div class="divider"></div>
+
+  <div class="schema-table">
+    <div class="schema-table-header"><span>crm_connections</span> — one row per CRM connected per user</div>
+    <div class="schema-row"><div class="schema-col-name">id<span class="schema-pk">PK</span></div><div class="schema-col-type">uuid</div><div class="schema-col-desc">Auto-generated primary key</div></div>
+    <div class="schema-row"><div class="schema-col-name">user_id</div><div class="schema-col-type">text</div><div class="schema-col-desc">Clerk user ID — foreign key to auth.users</div></div>
+    <div class="schema-row"><div class="schema-col-name">crm_type</div><div class="schema-col-type">text</div><div class="schema-col-desc">hubspot | pipedrive | zoho | salesforce | teamgate</div></div>
+    <div class="schema-row"><div class="schema-col-name">api_key_enc</div><div class="schema-col-type">text</div><div class="schema-col-desc">AES-256 encrypted API key — never stored in plaintext</div></div>
+    <div class="schema-row"><div class="schema-col-name">instance_url</div><div class="schema-col-type">text</div><div class="schema-col-desc">Salesforce only — org URL like https://org.salesforce.com</div></div>
+    <div class="schema-row"><div class="schema-col-name">last_synced_at</div><div class="schema-col-type">timestamptz</div><div class="schema-col-desc">When leads were last pulled from this CRM</div></div>
+    <div class="schema-row"><div class="schema-col-name">created_at</div><div class="schema-col-type">timestamptz</div><div class="schema-col-desc">When the connection was first made</div></div>
+  </div>
+
+  <div class="schema-table">
+    <div class="schema-table-header"><span>leads</span> — every dead lead pulled from CRM or CSV</div>
+    <div class="schema-row"><div class="schema-col-name">id<span class="schema-pk">PK</span></div><div class="schema-col-type">uuid</div><div class="schema-col-desc">Auto-generated primary key</div></div>
+    <div class="schema-row"><div class="schema-col-name">user_id</div><div class="schema-col-type">text</div><div class="schema-col-desc">Clerk user ID — row-level security key</div></div>
+    <div class="schema-row"><div class="schema-col-name">source_crm</div><div class="schema-col-type">text</div><div class="schema-col-desc">hubspot | pipedrive | zoho | salesforce | teamgate | csv</div></div>
+    <div class="schema-row"><div class="schema-col-name">external_id</div><div class="schema-col-type">text</div><div class="schema-col-desc">Original record ID from the CRM — used for deduplication on sync</div></div>
+    <div class="schema-row"><div class="schema-col-name">name</div><div class="schema-col-type">text</div><div class="schema-col-desc">Full name of the lead</div></div>
+    <div class="schema-row"><div class="schema-col-name">contact</div><div class="schema-col-type">text</div><div class="schema-col-desc">Email or phone number</div></div>
+    <div class="schema-row"><div class="schema-col-name">company</div><div class="schema-col-type">text</div><div class="schema-col-desc">Company name — used as search query for Tavily enrichment</div></div>
+    <div class="schema-row"><div class="schema-col-name">interest</div><div class="schema-col-type">text</div><div class="schema-col-desc">What product/service they were interested in</div></div>
+    <div class="schema-row"><div class="schema-col-name">last_contact_date</div><div class="schema-col-type">text</div><div class="schema-col-desc">When the last interaction happened</div></div>
+    <div class="schema-row"><div class="schema-col-name">cold_reason</div><div class="schema-col-type">text</div><div class="schema-col-desc">Why the lead went cold — critical input for scoring</div></div>
+    <div class="schema-row"><div class="schema-col-name">budget</div><div class="schema-col-type">text</div><div class="schema-col-desc">Budget mentioned if any</div></div>
+    <div class="schema-row"><div class="schema-col-name">notes</div><div class="schema-col-type">text</div><div class="schema-col-desc">Free-form notes from CRM</div></div>
+    <div class="schema-row"><div class="schema-col-name">raw_data</div><div class="schema-col-type">jsonb</div><div class="schema-col-desc">Full original record from CRM — preserved for future use</div></div>
+    <div class="schema-row"><div class="schema-col-name">created_at</div><div class="schema-col-type">timestamptz</div><div class="schema-col-desc">When this lead was first imported</div></div>
+    <div class="schema-row"><div class="schema-col-name">updated_at</div><div class="schema-col-type">timestamptz</div><div class="schema-col-desc">Last time this record was updated from CRM sync</div></div>
+  </div>
+
+  <div class="schema-table">
+    <div class="schema-table-header"><span>lead_scores</span> — one row per scoring run per lead (history kept)</div>
+    <div class="schema-row"><div class="schema-col-name">id<span class="schema-pk">PK</span></div><div class="schema-col-type">uuid</div><div class="schema-col-desc">Auto-generated primary key</div></div>
+    <div class="schema-row"><div class="schema-col-name">lead_id<span class="schema-fk">FK</span></div><div class="schema-col-type">uuid</div><div class="schema-col-desc">References leads.id</div></div>
+    <div class="schema-row"><div class="schema-col-name">batch_id<span class="schema-fk">FK</span></div><div class="schema-col-type">uuid</div><div class="schema-col-desc">References batches.id — which run produced this score</div></div>
+    <div class="schema-row"><div class="schema-col-name">score</div><div class="schema-col-type">integer</div><div class="schema-col-desc">Final revival score 1–10 (base score + web signal boost, capped at 10)</div></div>
+    <div class="schema-row"><div class="schema-col-name">base_score</div><div class="schema-col-type">integer</div><div class="schema-col-desc">Score from rubric dimensions before web signal boost</div></div>
+    <div class="schema-row"><div class="schema-col-name">boost</div><div class="schema-col-type">integer</div><div class="schema-col-desc">Points added from Tavily web signals (0–3)</div></div>
+    <div class="schema-row"><div class="schema-col-name">score_reason</div><div class="schema-col-type">text</div><div class="schema-col-desc">One plain-English sentence explaining the score</div></div>
+    <div class="schema-row"><div class="schema-col-name">signals</div><div class="schema-col-type">jsonb</div><div class="schema-col-desc">Full Tavily enrichment output: funding, hiring, intent, competitors, growth</div></div>
+    <div class="schema-row"><div class="schema-col-name">scored_at</div><div class="schema-col-type">timestamptz</div><div class="schema-col-desc">When this score was generated — used for freshness display</div></div>
+  </div>
+
+  <div class="grid-2">
+    <div class="schema-table">
+      <div class="schema-table-header"><span>batches</span></div>
+      <div class="schema-row"><div class="schema-col-name">id<span class="schema-pk">PK</span></div><div class="schema-col-type">uuid</div><div class="schema-col-desc">Primary key</div></div>
+      <div class="schema-row"><div class="schema-col-name">user_id</div><div class="schema-col-type">text</div><div class="schema-col-desc">Owner</div></div>
+      <div class="schema-row"><div class="schema-col-name">status</div><div class="schema-col-type">text</div><div class="schema-col-desc">pending | running | done | failed</div></div>
+      <div class="schema-row"><div class="schema-col-name">lead_count</div><div class="schema-col-type">integer</div><div class="schema-col-desc">Total leads in batch</div></div>
+      <div class="schema-row"><div class="schema-col-name">scored_count</div><div class="schema-col-type">integer</div><div class="schema-col-desc">Leads scored so far</div></div>
+      <div class="schema-row"><div class="schema-col-name">created_at</div><div class="schema-col-type">timestamptz</div><div class="schema-col-desc">Started at</div></div>
+      <div class="schema-row"><div class="schema-col-name">completed_at</div><div class="schema-col-type">timestamptz</div><div class="schema-col-desc">Finished at</div></div>
+    </div>
+    <div class="schema-table">
+      <div class="schema-table-header"><span>usage</span></div>
+      <div class="schema-row"><div class="schema-col-name">id<span class="schema-pk">PK</span></div><div class="schema-col-type">uuid</div><div class="schema-col-desc">Primary key</div></div>
+      <div class="schema-row"><div class="schema-col-name">user_id</div><div class="schema-col-type">text</div><div class="schema-col-desc">Owner</div></div>
+      <div class="schema-row"><div class="schema-col-name">month</div><div class="schema-col-type">text</div><div class="schema-col-desc">"2026-04" — resets monthly</div></div>
+      <div class="schema-row"><div class="schema-col-name">leads_scored</div><div class="schema-col-type">integer</div><div class="schema-col-desc">Running total for the month</div></div>
+      <div class="schema-row"><div class="schema-col-name">plan</div><div class="schema-col-type">text</div><div class="schema-col-desc">free | pro | scale</div></div>
+      <div class="schema-row"><div class="schema-col-name">updated_at</div><div class="schema-col-type">timestamptz</div><div class="schema-col-desc">Last increment</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ 06 SCORING ══ -->
+<div class="page">
+  <div class="section-num">06 — Lead Scoring Model</div>
+  <h2 class="section-title">How every lead gets<br />its revival score.</h2>
+  <p class="section-desc">Deterministic rubric + AI interpretation. Transparent, consistent, explainable.</p>
+  <div class="divider"></div>
+
+  <div class="callout callout-blue">
+    <strong>Design principle</strong>
+    The score is not a black box. Claude does not invent the number — it interprets qualitative text (cold reason, notes) and maps it to pre-defined dimension buckets. The math is deterministic. This means scores are consistent across runs and easy to explain to a sales manager.
+  </div>
+
+  <h3>Scoring dimensions</h3>
+
+  <div style="background: var(--surface); border-radius: 10px; padding: 4px; margin: 16px 0;">
+    <div class="score-section-label">Dimension 1 — Recency (max 3 pts)</div>
+    <div class="score-row" style="background: #f0fdf9;">
+      <div class="score-dim">Went cold</div>
+      <div class="score-cond">3–6 months ago</div>
+      <div class="score-pts" style="color: #16a34a;">+3</div>
+    </div>
+    <div class="score-row">
+      <div class="score-dim"></div>
+      <div class="score-cond">6–12 months ago</div>
+      <div class="score-pts" style="color: #ca8a04;">+2</div>
+    </div>
+    <div class="score-row">
+      <div class="score-dim"></div>
+      <div class="score-cond">1–2 years ago</div>
+      <div class="score-pts" style="color: #ea580c;">+1</div>
+    </div>
+    <div class="score-row">
+      <div class="score-dim"></div>
+      <div class="score-cond">2+ years ago</div>
+      <div class="score-pts" style="color: var(--red);">+0</div>
+    </div>
+
+    <div class="score-section-label">Dimension 2 — Cold Reason (max 2 pts)</div>
+    <div class="score-row" style="background: #f0fdf9;">
+      <div class="score-dim">Budget / timing</div>
+      <div class="score-cond">Temporary constraint — budget next quarter, team restructuring, etc.</div>
+      <div class="score-pts" style="color: #16a34a;">+2</div>
+    </div>
+    <div class="score-row">
+      <div class="score-dim">Lost to competitor</div>
+      <div class="score-cond">Chose a competitor — contracts end, dissatisfaction possible</div>
+      <div class="score-pts" style="color: #ca8a04;">+1</div>
+    </div>
+    <div class="score-row">
+      <div class="score-dim">Not interested</div>
+      <div class="score-cond">Explicit rejection, ghosted, not a fit</div>
+      <div class="score-pts" style="color: var(--red);">+0</div>
+    </div>
+
+    <div class="score-section-label">Dimension 3 — Budget Signal (max 2 pts)</div>
+    <div class="score-row" style="background: #f0fdf9;">
+      <div class="score-dim">Budget specified</div>
+      <div class="score-cond">A specific budget amount was mentioned in CRM notes</div>
+      <div class="score-pts" style="color: #16a34a;">+2</div>
+    </div>
+    <div class="score-row">
+      <div class="score-dim">Budget unknown</div>
+      <div class="score-cond">No budget mentioned</div>
+      <div class="score-pts" style="color: #ca8a04;">+1</div>
+    </div>
+
+    <div class="score-section-label">Dimension 4 — Engagement History (max 1 pt)</div>
+    <div class="score-row" style="background: #f0fdf9;">
+      <div class="score-dim">High engagement</div>
+      <div class="score-cond">Multiple touchpoints, attended demo, was close to closing</div>
+      <div class="score-pts" style="color: #16a34a;">+1</div>
+    </div>
+    <div class="score-row">
+      <div class="score-dim">Low engagement</div>
+      <div class="score-cond">Single contact, cold inquiry, no demo</div>
+      <div class="score-pts" style="color: var(--red);">+0</div>
+    </div>
+
+    <div class="score-section-label">Web Signal Boost — Tavily (max +3 pts on top of base)</div>
+    <div class="score-row" style="background: #f0fdf9;">
+      <div class="score-dim">Funding detected</div>
+      <div class="score-cond">Company raised money recently — more budget available</div>
+      <div class="score-pts" style="color: #16a34a;">+2</div>
+    </div>
+    <div class="score-row" style="background: #f0fdf9;">
+      <div class="score-dim">Active intent</div>
+      <div class="score-cond">Company evaluating similar tools right now</div>
+      <div class="score-pts" style="color: #16a34a;">+2</div>
+    </div>
+    <div class="score-row">
+      <div class="score-dim">Hiring signals</div>
+      <div class="score-cond">Hiring for roles that need this product</div>
+      <div class="score-pts" style="color: #ca8a04;">+1</div>
+    </div>
+    <div class="score-row">
+      <div class="score-dim">Competitor activity</div>
+      <div class="score-cond">Reviewed G2/Capterra for similar products</div>
+      <div class="score-pts" style="color: #ca8a04;">+1</div>
+    </div>
+    <div class="score-row">
+      <div class="score-dim">Growth signals</div>
+      <div class="score-cond">Company expanding — new office, growing team</div>
+      <div class="score-pts" style="color: #ca8a04;">+1</div>
+    </div>
+  </div>
+
+  <div class="callout callout-yellow" style="margin-top: 20px;">
+    <strong>Score calculation</strong>
+    Base score = Recency + Cold Reason + Budget + Engagement (max 8). Web boost = min(sum of Tavily signals, 3). Final score = min(base + boost, 10). Minimum score = 1.
+  </div>
+
+  <h3>Score tiers and actions</h3>
+  <table>
+    <thead><tr><th>Tier</th><th>Score</th><th>Colour</th><th>Recommended action</th></tr></thead>
+    <tbody>
+      <tr><td><span class="badge badge-teal">Hot</span></td><td>8–10</td><td>Green</td><td>Call this week — clear buying signal or timing window</td></tr>
+      <tr><td><span class="badge badge-yellow">Warm</span></td><td>5–7</td><td>Yellow</td><td>Call this month — viable, worth the effort</td></tr>
+      <tr><td><span class="badge badge-red">Cold</span></td><td>1–4</td><td>Red</td><td>Low priority — contact only after hot and warm list cleared</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Claude's prompt contract</h3>
+  <p>Claude Haiku receives the lead record, the enrichment signals, and the rubric. It must return JSON only with these fields:</p>
+  <div class="code-block"><pre>{
+  <span class="s">"recency_score"</span>:     <span class="n">2</span>,     <span class="c">// 0–3</span>
+  <span class="s">"reason_score"</span>:      <span class="n">2</span>,     <span class="c">// 0–2</span>
+  <span class="s">"budget_score"</span>:      <span class="n">1</span>,     <span class="c">// 0–2  (1 = unknown, 2 = mentioned)</span>
+  <span class="s">"engagement_score"</span>:  <span class="n">1</span>,     <span class="c">// 0–1</span>
+  <span class="s">"score_reason"</span>:      <span class="s">"Went cold due to budget constraint 8 months ago; had a demo and specific budget. Company is now hiring sales ops roles."</span>
+}</pre></div>
+  <p>The API route applies the boost and computes the final score. Claude never outputs the final score — it only fills the rubric dimensions.</p>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ 07 AGENTS ══ -->
+<div class="page">
+  <div class="section-num">07 — AI Agents Design</div>
+  <h2 class="section-title">Three agents.<br />One pipeline.</h2>
+  <p class="section-desc">Each agent has a single clear job. No agent does more than one thing.</p>
+  <div class="divider"></div>
+
+  <div class="agent-card">
+    <div class="agent-header" style="background: #f0fdf9; border-bottom: 1px solid #d1fae5;">
+      <div class="agent-icon" style="background: rgba(0,200,150,0.12);">🔍</div>
+      <div>
+        <div class="agent-name">Agent 1 — Enrichment Agent</div>
+        <div class="agent-trigger">Trigger: called once per lead during batch run</div>
+      </div>
+      <span class="badge badge-teal" style="margin-left: auto;">Tavily</span>
+    </div>
+    <div class="agent-body">
+      <div class="agent-row">
+        <div class="agent-row-label">Input</div>
+        <div class="agent-row-val">Lead name, company name, interest/product category</div>
+      </div>
+      <div class="agent-row">
+        <div class="agent-row-label">Process</div>
+        <div class="agent-row-val">Runs 5 Tavily searches simultaneously (asyncio.gather):<br />
+          1. <code>"{company}" funding raised investment 2024 2025</code><br />
+          2. <code>"{company}" hiring job {product} OR "sales operations" 2025</code><br />
+          3. <code>"{company}" evaluating OR looking for {product} OR switching</code><br />
+          4. <code>"{company}" review G2 Capterra {product} OR similar</code><br />
+          5. <code>"{company}" expansion growth new office team 2025</code>
+        </div>
+      </div>
+      <div class="agent-row">
+        <div class="agent-row-label">Output</div>
+        <div class="agent-row-val">Signals object: { funding_raw, hiring_raw, intent_raw, competitor_raw, growth_raw } — raw text from search results</div>
+      </div>
+      <div class="agent-row">
+        <div class="agent-row-label">Cost</div>
+        <div class="agent-row-val">5 Tavily API calls per lead. Free tier: 1,000 searches/month = 200 leads/month enriched free</div>
+      </div>
+      <div class="agent-row">
+        <div class="agent-row-label">Caching</div>
+        <div class="agent-row-val">Signals stored in lead_scores.signals column. Not re-fetched unless it's a weekly re-score run</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="agent-card">
+    <div class="agent-header" style="background: #eff6ff; border-bottom: 1px solid #dbeafe;">
+      <div class="agent-icon" style="background: rgba(59,130,246,0.1);">🧠</div>
+      <div>
+        <div class="agent-name">Agent 2 — Scoring Agent</div>
+        <div class="agent-trigger">Trigger: called per lead after enrichment completes</div>
+      </div>
+      <span class="badge badge-blue" style="margin-left: auto;">Claude Haiku 4.5</span>
+    </div>
+    <div class="agent-body">
+      <div class="agent-row">
+        <div class="agent-row-label">Input</div>
+        <div class="agent-row-val">Lead record (name, contact, interest, last_contact_date, cold_reason, budget, notes) + enrichment signals object</div>
+      </div>
+      <div class="agent-row">
+        <div class="agent-row-label">Process</div>
+        <div class="agent-row-val">System prompt contains the full scoring rubric. User message contains the lead data. Claude maps qualitative fields to rubric dimensions and returns dimension scores + score_reason as JSON only. The API applies boost math and computes final score.</div>
+      </div>
+      <div class="agent-row">
+        <div class="agent-row-label">Output</div>
+        <div class="agent-row-val">{ recency_score, reason_score, budget_score, engagement_score, score_reason } — Claude fills the rubric, not the final number</div>
+      </div>
+      <div class="agent-row">
+        <div class="agent-row-label">Cost</div>
+        <div class="agent-row-val">~$0.001 per lead at Haiku pricing. 1,000 leads = ~$1 total</div>
+      </div>
+      <div class="agent-row">
+        <div class="agent-row-label">Speed</div>
+        <div class="agent-row-val">1–2 seconds per lead. 1,000 leads in parallel ≈ 10–15 seconds total on FastAPI</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="agent-card">
+    <div class="agent-header" style="background: #f5f3ff; border-bottom: 1px solid #ede9fe;">
+      <div class="agent-icon" style="background: rgba(139,92,246,0.1);">⚙️</div>
+      <div>
+        <div class="agent-name">Agent 3 — Batch Orchestrator</div>
+        <div class="agent-trigger">Trigger: manual (user clicks "Run scoring") or Vercel Cron weekly</div>
+      </div>
+      <span class="badge badge-purple" style="margin-left: auto;">FastAPI</span>
+    </div>
+    <div class="agent-body">
+      <div class="agent-row">
+        <div class="agent-row-label">Input</div>
+        <div class="agent-row-val">user_id, optional: list of specific lead IDs to score (else scores all)</div>
+      </div>
+      <div class="agent-row">
+        <div class="agent-row-label">Process</div>
+        <div class="agent-row-val">
+          1. Check usage table — block if monthly limit exceeded<br />
+          2. Create batch record in DB (status: running)<br />
+          3. Pull all leads for user from Supabase<br />
+          4. Run Agent 1 on all leads in parallel (asyncio.gather)<br />
+          5. Run Agent 2 on all leads in parallel with their signals<br />
+          6. Write all scores to lead_scores table<br />
+          7. Increment usage.leads_scored<br />
+          8. Update batch status → done<br />
+          9. If triggered by cron: call /notify/digest endpoint
+        </div>
+      </div>
+      <div class="agent-row">
+        <div class="agent-row-label">Output</div>
+        <div class="agent-row-val">Batch record updated in DB. Dashboard reads scores via Supabase real-time subscription — no polling needed.</div>
+      </div>
+      <div class="agent-row">
+        <div class="agent-row-label">Endpoint</div>
+        <div class="agent-row-val">POST /batch/score — accepts { user_id, lead_ids? } — returns { batch_id, status }</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ 08 CRM ══ -->
+<div class="page">
+  <div class="section-num">08 — CRM Integration</div>
+  <h2 class="section-title">How dead leads get<br />into the system.</h2>
+  <div class="divider"></div>
+
+  <h3>Supported CRMs</h3>
+  <table>
+    <thead><tr><th>CRM</th><th>Auth method</th><th>What is pulled</th><th>Filter</th></tr></thead>
+    <tbody>
+      <tr><td><strong>HubSpot</strong></td><td>Private App Token</td><td>Contacts</td><td>lead_status = cold, unqualified, or not last contacted in 90+ days</td></tr>
+      <tr><td><strong>Pipedrive</strong></td><td>API Token</td><td>Persons</td><td>last_activity_date older than 90 days</td></tr>
+      <tr><td><strong>Zoho CRM</strong></td><td>OAuth Access Token</td><td>Leads module</td><td>Lead_Status = Cold, Inactive, Not Contacted</td></tr>
+      <tr><td><strong>Salesforce</strong></td><td>Access Token + Instance URL</td><td>Lead object</td><td>IsConverted = false, LastActivityDate oldest first</td></tr>
+      <tr><td><strong>Teamgate</strong></td><td>API Key</td><td>Leads</td><td>status = inactive</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Sync strategy</h3>
+  <table>
+    <thead><tr><th>Event</th><th>What happens</th></tr></thead>
+    <tbody>
+      <tr><td>First connect</td><td>Pull up to 500 inactive leads immediately. Store in <code>leads</code> table with <code>external_id</code> for deduplication.</td></tr>
+      <tr><td>Weekly cron (Monday 6am)</td><td>Pull records updated or created since <code>last_synced_at</code>. Insert new, update changed. Update <code>crm_connections.last_synced_at</code>.</td></tr>
+      <tr><td>Manual re-sync</td><td>User can trigger from Settings page at any time. Same logic as weekly cron.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout callout-red">
+    <strong>Security — API key storage</strong>
+    CRM API keys are encrypted with AES-256 before being written to the database. The encryption key is stored in an environment variable, never in the DB. Keys are decrypted only at the moment they are used (inside the FastAPI service) and never returned to the frontend.
+  </div>
+
+  <h3>Deduplication</h3>
+  <p>Each lead record stores the original CRM record ID as <code>external_id</code>. On every sync, the pipeline uses an upsert (INSERT … ON CONFLICT (user_id, source_crm, external_id) DO UPDATE) so duplicate imports never create duplicate rows.</p>
+
+  <h3>CSV fallback</h3>
+  <p>For users without a supported CRM, CSV upload remains available. Required columns: <code>name, contact, interest, lastContact, reason</code>. Optional: <code>budget, notes</code>. CSV leads get <code>source_crm = "csv"</code> and no <code>external_id</code>.</p>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ 09 SCHEDULING ══ -->
+<div class="page">
+  <div class="section-num">09 — Scheduling &amp; Data Freshness</div>
+  <h2 class="section-title">How scores stay current<br />without manual effort.</h2>
+  <div class="divider"></div>
+
+  <h3>Weekly cron schedule (Vercel Cron)</h3>
+  <table>
+    <thead><tr><th>Time</th><th>Job</th><th>What it does</th></tr></thead>
+    <tbody>
+      <tr><td>Monday 6:00am</td><td>CRM sync</td><td>Pulls new dead leads from all connected CRMs for all users. Inserts/updates <code>leads</code> table.</td></tr>
+      <tr><td>Monday 7:00am</td><td>Re-score</td><td>Calls FastAPI <code>POST /batch/score</code> for each user. Fresh Tavily searches. All leads re-scored. New rows in <code>lead_scores</code>.</td></tr>
+      <tr><td>Monday 8:00am</td><td>Email digest</td><td>Queries top 10 hot leads per user. Checks for score jumps (≥3 points). Sends digest email via Resend.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Freshness display</h3>
+  <p>Every score row has a <code>scored_at</code> timestamp. The dashboard shows "Scored 2 days ago" next to each lead. If a score is older than 14 days, it shows a warning badge nudging the user to re-run scoring.</p>
+
+  <h3>Manual trigger</h3>
+  <p>Users can click "Run scoring" from the dashboard at any time. This is a direct call to the FastAPI batch endpoint — no cron involved. Usage is deducted from their monthly allowance.</p>
+
+  <div class="callout callout-teal">
+    <strong>Why weekly re-score matters</strong>
+    A lead that scored 4 last month (cold — budget constraint) might score 9 this week if Tavily finds they just raised a funding round. Without re-scoring, the calling team would never know to call them. Weekly cadence keeps the ranked list accurate to current reality.
+  </div>
+
+  <h3>Score jump alert (immediate)</h3>
+  <p>Separate from the weekly digest. Every time a re-score completes, the pipeline compares new scores to previous scores. If any lead's score increased by 3 or more points, an immediate email alert is sent — regardless of what day it is. This is the "hot signal" notification.</p>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ 10 NOTIFICATIONS ══ -->
+<div class="page">
+  <div class="section-num">10 — Notifications</div>
+  <h2 class="section-title">How sales managers get<br />informed without noise.</h2>
+  <div class="divider"></div>
+
+  <div class="callout callout-blue">
+    <strong>Design principle</strong>
+    The dashboard is the source of truth — not email. Email only notifies managers when something worth acting on has changed. No daily spam, no full lead dumps over email.
+  </div>
+
+  <h3>Weekly digest email — every Monday</h3>
+  <table>
+    <thead><tr><th>Field</th><th>Content</th></tr></thead>
+    <tbody>
+      <tr><td>Subject</td><td>"Your top leads this week — ReviveIQ"</td></tr>
+      <tr><td>Body</td><td>Top 10 hot leads (score 8–10) with: name, score, one-line reason, last contact date</td></tr>
+      <tr><td>Score changes</td><td>Any leads whose score jumped since last week, highlighted with old → new score</td></tr>
+      <tr><td>CTA</td><td>Single button: "Open dashboard" — no full list in email, just a preview</td></tr>
+      <tr><td>Sent via</td><td>Resend (already integrated)</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Score jump alert — immediate</h3>
+  <table>
+    <thead><tr><th>Field</th><th>Content</th></tr></thead>
+    <tbody>
+      <tr><td>Trigger</td><td>Lead score increases by ≥ 3 points in any re-score run</td></tr>
+      <tr><td>Subject</td><td>"🔥 Hot signal: [Lead name] jumped from 4 → 9"</td></tr>
+      <tr><td>Body</td><td>Lead name, old score, new score, what changed (e.g. "Just raised Series A funding")</td></tr>
+      <tr><td>CTA</td><td>"View lead" — deep link to lead detail in dashboard</td></tr>
+      <tr><td>Sent via</td><td>Resend</td></tr>
+    </tbody>
+  </table>
+
+  <h3>In-app notifications (future)</h3>
+  <p>Not in Phase 1. Phase 2 can add a notification bell in the dashboard using Supabase real-time subscriptions — when a batch completes or a score jumps, the dashboard updates without page refresh.</p>
+
+  <h3>What is NOT sent over email</h3>
+  <ul class="plain">
+    <li>Full lead list with all scores — that lives in the dashboard</li>
+    <li>Cold or warm leads (1–7) — only hot leads and score jumps are worth an alert</li>
+    <li>Daily emails — weekly cadence prevents notification fatigue</li>
+    <li>Individual lead WhatsApp messages or call briefs — Phase 2</li>
+  </ul>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ 11 DASHBOARD ══ -->
+<div class="page">
+  <div class="section-num">11 — Dashboard Design</div>
+  <h2 class="section-title">What the sales manager<br />sees every day.</h2>
+  <div class="divider"></div>
+
+  <h3>Routes</h3>
+  <table>
+    <thead><tr><th>Route</th><th>Auth</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td><code>/</code></td><td>Public</td><td>Marketing landing page with waitlist form</td></tr>
+      <tr><td><code>/sign-in</code></td><td>Public</td><td>Clerk sign-in UI</td></tr>
+      <tr><td><code>/sign-up</code></td><td>Public</td><td>Clerk sign-up UI</td></tr>
+      <tr><td><code>/dashboard</code></td><td>Protected</td><td>Main lead scoring view — ranked table + metric cards</td></tr>
+      <tr><td><code>/dashboard/settings</code></td><td>Protected</td><td>CRM connections, notification email, plan &amp; usage</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Dashboard main view — component layout</h3>
+  <div class="code-block"><pre>
+┌─────────────────────────────────────────────────────────┐
+│  Header: ReviveIQ logo · Nav · User avatar              │
+├─────────────────────────────────────────────────────────┤
+│  Metric row (4 cards)                                   │
+│  [Total leads] [Hot 8–10] [Warm 5–7] [Last scored: Xd] │
+├───────────────────────────────┬─────────────────────────┤
+│  Lead table (ranked by score) │  Lead detail panel      │
+│                               │                         │
+│  Score · Name · Interest      │  Score circle (large)   │
+│  Last contact · Reason        │  Score reason           │
+│  Score reason (truncated)     │  Web signals panel      │
+│  Signal boost badge           │    (funding, hiring…)   │
+│                               │  Last contact           │
+│  [Filter: All / Hot / Warm]   │  Budget                 │
+│  [Export CSV]  [Run scoring]  │  Notes                  │
+└───────────────────────────────┴─────────────────────────┘
+  </pre></div>
+
+  <h3>Lead table columns</h3>
+  <table>
+    <thead><tr><th>Column</th><th>Display</th><th>Sortable</th></tr></thead>
+    <tbody>
+      <tr><td>Score</td><td>Coloured circle — green (8–10), yellow (5–7), red (1–4)</td><td>Yes — default sort</td></tr>
+      <tr><td>Name</td><td>Full name</td><td>No</td></tr>
+      <tr><td>Contact</td><td>Email or phone</td><td>No</td></tr>
+      <tr><td>Interest</td><td>Product/service they wanted</td><td>No</td></tr>
+      <tr><td>Last contact</td><td>Relative (e.g. "8 months ago")</td><td>Yes</td></tr>
+      <tr><td>Cold reason</td><td>Truncated to 40 chars</td><td>No</td></tr>
+      <tr><td>Signals</td><td>Coloured dot if web boost &gt; 0</td><td>No</td></tr>
+      <tr><td>Scored</td><td>"3 days ago" — freshness indicator</td><td>Yes</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Settings page</h3>
+  <ul class="plain">
+    <li>CRM connections: connect / disconnect, shows connection status and last synced timestamp</li>
+    <li>Notification email: where weekly digest and alerts are sent</li>
+    <li>Plan &amp; usage: progress bar showing X / 1000 leads scored this month, upgrade CTA</li>
+    <li>Manual re-sync: trigger a CRM pull from settings without going through the dashboard</li>
+  </ul>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ 12 MONETISATION ══ -->
+<div class="page">
+  <div class="section-num">12 — Monetisation Model</div>
+  <h2 class="section-title">Usage-based pricing<br />tied to recovered revenue.</h2>
+  <div class="divider"></div>
+
+  <h3>Plans</h3>
+  <table>
+    <thead><tr><th>Plan</th><th>Leads scored / month</th><th>CRM connections</th><th>Email alerts</th><th>Price</th></tr></thead>
+    <tbody>
+      <tr><td><span class="badge badge-gray">Free</span></td><td>100</td><td>1</td><td>Weekly digest only</td><td>₹0</td></tr>
+      <tr><td><span class="badge badge-teal">Pro</span></td><td>1,000</td><td>3</td><td>Digest + score jump alerts</td><td>TBD after pilot</td></tr>
+      <tr><td><span class="badge badge-purple">Scale</span></td><td>Unlimited</td><td>Unlimited</td><td>All alerts + custom frequency</td><td>TBD after pilot</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout callout-yellow">
+    <strong>Pricing strategy note</strong>
+    Do not set prices before the pilot proves value. Run the pilot on Free tier. Once 10–15 internal leads convert to customers, calculate the recovered revenue. Price Pro at roughly 10% of the value of one recovered deal per month. That makes the ROI obvious and the upgrade an easy decision.
+  </div>
+
+  <h3>Usage tracking logic</h3>
+  <ul class="plain">
+    <li>Before every batch run: check <code>usage</code> table for current month's <code>leads_scored</code></li>
+    <li>If <code>leads_scored + batch_size &gt; plan_limit</code>: block the run and show upgrade prompt</li>
+    <li>If within limit: run batch, increment <code>leads_scored</code> by actual leads processed</li>
+    <li>Usage resets on the 1st of each calendar month (new row in <code>usage</code> table)</li>
+    <li>Re-scoring existing leads counts toward the monthly total — incentivises paid plans for weekly automation</li>
+  </ul>
+
+  <h3>Stripe integration (Phase 4 — after pilot)</h3>
+  <ul class="plain">
+    <li>Upgrade button triggers Stripe Checkout session</li>
+    <li>Stripe webhook on payment success updates <code>usage.plan</code> in DB</li>
+    <li>Downgrade at period end — plan reverts to Free, usage cap drops</li>
+    <li>No credit card required for Free tier</li>
+  </ul>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ 13 BUILD PLAN ══ -->
+<div class="page">
+  <div class="section-num">13 — Phased Build Plan</div>
+  <h2 class="section-title">What gets built,<br />in what order, and why.</h2>
+  <p class="section-desc">Each phase delivers standalone value before the next begins.</p>
+  <div class="divider"></div>
+
+  <div class="phase-block">
+    <div class="phase-header">
+      <div class="phase-num">1</div>
+      <div class="phase-title">Foundation — Persistence &amp; Auth</div>
+      <span class="badge badge-teal">Start here</span>
+    </div>
+    <div class="phase-body">
+      <ul>
+        <li>Install Supabase JS client + set up project, create all 5 tables with row-level security</li>
+        <li>Install Clerk, wrap app in ClerkProvider, add middleware to protect /dashboard routes</li>
+        <li>Save CRM leads to DB on connect (currently dropped after session ends)</li>
+        <li>Save scored results to DB (currently lost on page refresh)</li>
+        <li>Dashboard reads leads + scores from DB instead of local state</li>
+        <li>Set up .env.local with SUPABASE_URL, SUPABASE_ANON_KEY, CLERK_PUBLISHABLE_KEY, CLERK_SECRET_KEY</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="phase-block">
+    <div class="phase-header">
+      <div class="phase-num">2</div>
+      <div class="phase-title">Python FastAPI Scoring Service</div>
+      <span class="badge badge-blue">After Phase 1</span>
+    </div>
+    <div class="phase-body">
+      <ul>
+        <li>Create FastAPI project with /batch/score and /batch/sync-crm endpoints</li>
+        <li>Port enrichment agent (Tavily) from Next.js API route to Python async functions</li>
+        <li>Restructure scoring agent to use the rubric model — Claude fills dimensions, API computes final score</li>
+        <li>Batch orchestrator: parallel enrichment + scoring, write to Supabase, update batch status</li>
+        <li>Deploy to Railway or Render</li>
+        <li>Update Next.js dashboard to call FastAPI instead of /api/process-leads</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="phase-block">
+    <div class="phase-header">
+      <div class="phase-num">3</div>
+      <div class="phase-title">Automation &amp; Notifications</div>
+      <span class="badge badge-purple">After Phase 2</span>
+    </div>
+    <div class="phase-body">
+      <ul>
+        <li>Vercel Cron: weekly CRM sync job (Monday 6am)</li>
+        <li>Vercel Cron: weekly re-score job (Monday 7am) — calls FastAPI</li>
+        <li>Weekly email digest via Resend — top 10 hot leads sent Monday 8am</li>
+        <li>Score jump alert — immediate email when any lead score jumps ≥ 3 points</li>
+        <li>Usage tracking — leads_scored counter incremented per batch</li>
+        <li>Usage gate — block batch run if monthly limit exceeded, show upgrade prompt</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="phase-block">
+    <div class="phase-header">
+      <div class="phase-num">4</div>
+      <div class="phase-title">Monetisation</div>
+      <span class="badge badge-yellow">After pilot proves value</span>
+    </div>
+    <div class="phase-body">
+      <ul>
+        <li>Stripe Checkout integration — upgrade button triggers payment flow</li>
+        <li>Stripe webhook — updates user plan in DB on successful payment</li>
+        <li>Plan management UI in Settings page</li>
+        <li>Downgrade handling — revert plan at period end</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="phase-block">
+    <div class="phase-header">
+      <div class="phase-num">5</div>
+      <div class="phase-title">Calling AI Features</div>
+      <span class="badge badge-gray">Future — not now</span>
+    </div>
+    <div class="phase-body">
+      <ul>
+        <li>Automated personalised WhatsApp / email warm-up before calls</li>
+        <li>AI-generated call brief with talking points, objections, what to avoid</li>
+        <li>Auto CRM push — push revived lead back to pipeline after successful call</li>
+        <li>Conversation intelligence — live cheat sheet during the call</li>
+        <li>Instant proposal generation — personalised proposal in 60 seconds on the call</li>
+        <li>Slip-through watchdog — flag leads never contacted in a batch</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ 14 ALREADY BUILT ══ -->
+<div class="page">
+  <div class="section-num">14 — What Is Already Built</div>
+  <h2 class="section-title">Starting point —<br />what exists today.</h2>
+  <p class="section-desc">Built as of April 17, 2026. This is the working foundation Phase 1 builds on.</p>
+  <div class="divider"></div>
+
+  <h3>Landing page — <code>src/app/page.tsx</code></h3>
+  <ul class="plain">
+    <li>Full ReviveIQ marketing page: hero, stats bar, problem/solution comparison, how-it-works, AI signals section, CRM logo strip</li>
+    <li>Early access waitlist form — email + company → POST /api/waitlist</li>
+    <li>Design system: #080808 dark background, #00e5a0 teal accent, Geist serif headings — matches brand spec</li>
+    <li>Floating demo card with sample scored leads and score circles</li>
+  </ul>
+
+  <h3>Dashboard — <code>src/app/dashboard/page.tsx</code></h3>
+  <ul class="plain">
+    <li>2-step flow: business setup (company name, product, tone) → lead import</li>
+    <li>CRM connect toggle: select CRM, paste API key, click Connect → fetches leads live</li>
+    <li>CSV upload: paste raw CSV with sample data preloaded</li>
+    <li>Processing screen with progress bar</li>
+    <li>Results view: hot/warm/cold metric cards, ranked lead list with score circles, detail panel with web signals + score reason</li>
+    <li>Export to CSV button</li>
+    <li><strong>Missing</strong>: no auth, results not persisted to DB, lost on refresh</li>
+  </ul>
+
+  <h3>API Routes</h3>
+  <table>
+    <thead><tr><th>Route</th><th>Status</th><th>Does what</th></tr></thead>
+    <tbody>
+      <tr><td><code>/api/crm</code></td><td><span class="badge badge-teal">Working</span></td><td>Connects to HubSpot, Pipedrive, Zoho, Salesforce, Teamgate and fetches leads</td></tr>
+      <tr><td><code>/api/process-leads</code></td><td><span class="badge badge-teal">Working</span></td><td>Enriches with Tavily + scores with Claude Haiku + returns ranked results</td></tr>
+      <tr><td><code>/api/waitlist</code></td><td><span class="badge badge-yellow">Partial</span></td><td>Accepts signups. Sends to Google Sheets + Resend only if env vars are set</td></tr>
+      <tr><td><code>/api/enrich-lead</code></td><td><span class="badge badge-gray">Exists</span></td><td>Standalone enrichment endpoint — not wired to dashboard UI yet</td></tr>
+    </tbody>
+  </table>
+
+  <h3>UI components</h3>
+  <p>shadcn/ui: Badge, Card, Input, Progress, Select, Separator, Table, Textarea, Button. Tailwind CSS v4. IBM Plex Sans font. Custom CSS variables for design tokens (--teal, etc.).</p>
+
+  <h3>Dependencies installed</h3>
+  <p><code>@anthropic-ai/sdk</code>, <code>@tavily/core</code>, <code>resend</code>, <code>next 16.2.3</code>, <code>react 19</code>, <code>tailwindcss v4</code>, <code>shadcn/ui</code></p>
+  <p><strong>Not yet installed</strong>: <code>@supabase/supabase-js</code>, <code>@supabase/ssr</code>, <code>@clerk/nextjs</code></p>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ 15 RISKS ══ -->
+<div class="page">
+  <div class="section-num">15 — Open Decisions &amp; Risks</div>
+  <h2 class="section-title">What needs a decision<br />before building.</h2>
+  <div class="divider"></div>
+
+  <h3>Open decisions</h3>
+  <table>
+    <thead><tr><th>Decision</th><th>Options</th><th>Recommendation</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>Python backend hosting</td>
+        <td>Railway, Render, Fly.io, VPS</td>
+        <td><strong>Railway</strong> — simplest deploy from GitHub, free starter tier, $5/month hobby plan for always-on</td>
+      </tr>
+      <tr>
+        <td>API key encryption</td>
+        <td>AES-256 in app, Supabase Vault, HashiCorp Vault</td>
+        <td><strong>AES-256 in app</strong> for Phase 1 — simple, sufficient, upgrade to Vault later if needed</td>
+      </tr>
+      <tr>
+        <td>Real-time batch progress</td>
+        <td>Supabase real-time, polling, Server-Sent Events</td>
+        <td><strong>Supabase real-time</strong> — dashboard subscribes to <code>batches</code> table, updates automatically as <code>scored_count</code> increments</td>
+      </tr>
+      <tr>
+        <td>Pricing numbers</td>
+        <td>Set now vs. after pilot</td>
+        <td><strong>After pilot</strong> — build the infrastructure now but leave prices TBD until recovered revenue is proven</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>Risks and mitigations</h3>
+  <table>
+    <thead><tr><th>Risk</th><th>Likelihood</th><th>Mitigation</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>Tavily free tier exhausted (1,000 searches/month = 200 leads)</td>
+        <td>Medium — happens as soon as pilot grows</td>
+        <td>Tavily Pro is $20/month for 10,000 searches. Build in usage tracking so we know when we're close. Factor into pricing.</td>
+      </tr>
+      <tr>
+        <td>CRM API tokens expire (especially Zoho OAuth)</td>
+        <td>High for Zoho</td>
+        <td>Detect auth errors on sync, email user to reconnect. Add token refresh flow for Zoho in Phase 2.</td>
+      </tr>
+      <tr>
+        <td>Claude Haiku scores inconsistently on ambiguous cold reasons</td>
+        <td>Medium</td>
+        <td>Rubric reduces ambiguity significantly. Add a few-shot examples to the system prompt if consistency issues are observed in pilot.</td>
+      </tr>
+      <tr>
+        <td>Vercel Cron misses a run (rare but possible)</td>
+        <td>Low</td>
+        <td>Cron is best-effort on Vercel. For the pilot this is acceptable. If reliability becomes critical, move cron to the FastAPI service with its own scheduler.</td>
+      </tr>
+      <tr>
+        <td>User's CRM has non-standard "inactive" lead status values</td>
+        <td>Medium</td>
+        <td>Pull broadly (all contacts/leads with no activity in 90+ days) rather than filtering by status field, which varies by CRM setup.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>First actions to take right now</h3>
+  <ul class="plain">
+    <li>Create Supabase project → get Project URL and anon key</li>
+    <li>Create Clerk application → get Publishable key and Secret key</li>
+    <li>Share those 4 keys so Phase 1 build can begin immediately</li>
+    <li>Decide on Railway vs Render for FastAPI hosting (Railway recommended)</li>
+  </ul>
+
+  <div class="callout callout-teal" style="margin-top: 32px;">
+    <strong>Summary verdict</strong>
+    Next.js + Clerk for the web layer. Python FastAPI on Railway for the AI batch pipeline. Supabase as the shared database. Claude Haiku fills a deterministic scoring rubric. Tavily provides live web intelligence. Resend sends weekly digests and score alerts. Stripe handles payments after the pilot. Build in that order.
+  </div>
+</div>
+
+</body>
+</html>
