@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import Groq from "groq-sdk";
 import { tavily } from "@tavily/core";
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
+const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
 export interface Lead {
   name: string;
@@ -28,6 +28,10 @@ export interface EnrichmentSignals {
 export interface ProcessedLead extends Lead {
   score: number;
   scoreReason: string;
+  fitScore?: number;
+  revivalScore?: number;
+  roiEstimate?: number;
+  roiReason?: string;
   signals?: EnrichmentSignals | null;
 }
 
@@ -80,29 +84,41 @@ async function enrichLead(lead: Lead, product: string): Promise<EnrichmentSignal
 
 function buildPrompt(lead: Lead, businessName: string, product: string, signals: EnrichmentSignals | null) {
   const sig = signals
-    ? `\nWeb signals found:\n- Funding: ${signals.recentFunding || "none"}\n- Hiring: ${signals.hiringSignals || "none"}\n- Intent: ${signals.intentSignals || "none"}\n- Competitors: ${signals.competitorEngagement || "none"}\n- Growth: ${signals.companyGrowth || "none"}`
+    ? `\nWeb signals:\n- Funding: ${signals.recentFunding || "none"}\n- Hiring: ${signals.hiringSignals || "none"}\n- Intent: ${signals.intentSignals || "none"}\n- Competitors: ${signals.competitorEngagement || "none"}\n- Growth: ${signals.companyGrowth || "none"}`
     : "";
 
-  return `You score dead sales leads for ${businessName || "a B2B sales company"} selling ${product || "their product"}.
+  return `You score dead sales leads for ${businessName || "a B2B company"} that sells: "${product || "their product"}".
 
-Scoring rubric (deterministic):
-- Recency: went cold 3–6 months ago = 3pts | 6–12 months = 2pts | 1–2 years = 1pt | 2+ years = 0pts
-- Cold reason: budget/timing constraint = 2pts | lost to competitor = 1pt | not interested/ghosted = 0pts
-- Budget signal: specific amount mentioned = 2pts | unknown = 1pt
-- Past engagement: multiple calls/demo done = 1pt | single touchpoint = 0pts
-Web signals add bonus on top (max +3).
+Score this lead 1–10. Two things matter equally:
+
+1. PRODUCT FIT (0–5 pts): Does this company actually need what we sell?
+   - Their industry/business directly needs our product = 4–5 pts
+   - Their business could benefit but it's not core = 2–3 pts
+   - Poor fit, unlikely to ever need this = 0–1 pt
+   Example: if we sell food delivery software → food companies score 5, banks score 1.
+
+2. REVIVAL LIKELIHOOD (0–5 pts): How likely are they to buy now?
+   - Went cold 3–6 months ago = +1 | Had specific budget = +1 | Budget/timing reason = +1 | Did demo/trial = +1 | Web signals show growth/funding = +1
+
+Add both together for final score (1–10).
+
+3. ROI ESTIMATE: Estimate the monthly financial value this company would get FROM using our product.
+   Think about: dev cost savings, faster time-to-market, revenue from new capabilities, headcount avoided.
+   - Return roiEstimate as a plain integer (monthly value in same currency units as their budget, e.g. if budget is in INR return INR amount, no symbols)
+   - Return roiReason as one short sentence explaining the biggest value driver
+   - If budget is "Not shared" or unclear, estimate conservatively based on company size and use case
 
 Lead:
 Name: ${lead.name}
 Company: ${lead.company || "unknown"}
-Interested in: ${lead.interest}
+Interest: ${lead.interest}
 Last contact: ${lead.lastContact}
 Why went cold: ${lead.reason}
 Budget: ${lead.budget || "not mentioned"}
 Notes: ${lead.notes || "none"}${sig}
 
-Return ONLY valid JSON — no markdown, no explanation:
-{"score":<1-10>,"scoreReason":"<one plain-English sentence explaining the score>"}`;
+Return ONLY valid JSON:
+{"score":<1-10>,"scoreReason":"<one sentence: mention fit + revival reason>","fitScore":<0-5>,"revivalScore":<0-5>,"roiEstimate":<integer>,"roiReason":"<one sentence>"}`;
 }
 
 export async function POST(req: NextRequest) {
@@ -125,10 +141,17 @@ export async function POST(req: NextRequest) {
         const prompt = buildPrompt(lead, businessName, product, signals);
 
         try {
-          const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
-          const result = await model.generateContent(prompt);
-          const raw = result.response.text().replace(/```json|```/g, "").trim();
-          const parsed = JSON.parse(raw);
+          const completion = await groq.chat.completions.create({
+            model: "llama-3.1-8b-instant",
+            messages: [{ role: "user", content: prompt }],
+            max_tokens: 300,
+            temperature: 0.3,
+          });
+          const text = completion.choices[0]?.message?.content || "";
+          // Extract JSON object even if model wraps it in extra text
+          const match = text.match(/\{[\s\S]*\}/);
+          if (!match) throw new Error("No JSON in response");
+          const parsed = JSON.parse(match[0]);
 
           if (signals && signals.scoreBoost > 0) {
             parsed.score = Math.min(10, parsed.score + signals.scoreBoost);
@@ -136,13 +159,14 @@ export async function POST(req: NextRequest) {
 
           return { ...lead, ...parsed, signals } as ProcessedLead;
         } catch (e) {
-          console.error("Scoring error for", lead.name, e);
-          return null;
+          const msg = e instanceof Error ? e.message : String(e);
+          console.error("Scoring error for", lead.name, msg);
+          return { ...lead, score: 0, scoreReason: `Error: ${msg}`, signals: null } as ProcessedLead;
         }
       })
     );
 
-    const results = (processed.filter(Boolean) as ProcessedLead[])
+    const results = (processed as ProcessedLead[])
       .sort((a, b) => b.score - a.score);
 
     return NextResponse.json({ leads: results });

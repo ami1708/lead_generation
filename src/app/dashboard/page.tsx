@@ -155,11 +155,19 @@ export default function Dashboard() {
     );
   }
 
+  function formatROI(n: number) {
+    if (n >= 10000000) return `₹${(n / 10000000).toFixed(1)}Cr/mo`;
+    if (n >= 100000)   return `₹${(n / 100000).toFixed(1)}L/mo`;
+    if (n >= 1000)     return `₹${(n / 1000).toFixed(0)}K/mo`;
+    return `₹${n}/mo`;
+  }
+
   // ── RESULTS ────────────────────────────────────────────────────────────────
   if (results.length > 0) {
     const hot  = results.filter(l => l.score >= 8).length;
     const warm = results.filter(l => l.score >= 5 && l.score < 8).length;
     const cold = results.filter(l => l.score < 5).length;
+    const totalROI = results.filter(l => l.score >= 5).reduce((s, l) => s + (l.roiEstimate || 0), 0);
     const filtered = results.filter(l =>
       activeFilter === "hot" ? l.score >= 8 :
       activeFilter === "warm" ? l.score >= 5 && l.score < 8 :
@@ -181,7 +189,7 @@ export default function Dashboard() {
 
         <div className="max-w-6xl mx-auto w-full px-8 py-8 space-y-6">
           {/* Metric row */}
-          <div className="grid grid-cols-4 gap-4">
+          <div className="grid grid-cols-5 gap-4">
             {[
               { label: "Total",  sub: "leads processed",  n: results.length, color: "rgba(255,255,255,0.8)", filter: "all"  as const },
               { label: "Hot",    sub: "call this week",    n: hot,            color: "#4ade80",               filter: "hot"  as const },
@@ -196,6 +204,14 @@ export default function Dashboard() {
                 <p className="text-zinc-600 text-xs">{s.sub}</p>
               </button>
             ))}
+            {/* ROI pipeline card */}
+            <div className="card p-5 text-left" style={{ borderColor: "rgba(0,229,160,0.2)", background: "rgba(0,229,160,0.04)" }}>
+              <p className="font-serif text-2xl font-black mb-1 leading-tight" style={{ color: "var(--teal)" }}>
+                {totalROI > 0 ? formatROI(totalROI) : "—"}
+              </p>
+              <p className="text-zinc-200 text-sm font-semibold">ROI pipeline</p>
+              <p className="text-zinc-600 text-xs">hot + warm leads combined</p>
+            </div>
           </div>
 
           <div className="grid lg:grid-cols-5 gap-6">
@@ -249,6 +265,40 @@ export default function Dashboard() {
                     <p className="label mb-1.5">AI score reason</p>
                     <p className="text-zinc-200 text-sm leading-relaxed italic">&ldquo;{sel.scoreReason}&rdquo;</p>
                   </div>
+                  {(sel.fitScore !== undefined || sel.revivalScore !== undefined) && (
+                    <div className="space-y-3">
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="card px-4 py-3">
+                          <p className="label mb-1">Product fit</p>
+                          <div className="flex items-center gap-2">
+                            <span className="font-serif text-2xl font-black" style={{ color: sel.fitScore! >= 4 ? "#4ade80" : sel.fitScore! >= 2 ? "#facc15" : "#f87171" }}>{sel.fitScore}</span>
+                            <span className="text-zinc-600 text-xs">/ 5</span>
+                          </div>
+                          <p className="text-zinc-600 text-xs mt-0.5">industry match</p>
+                        </div>
+                        <div className="card px-4 py-3">
+                          <p className="label mb-1">Revival likelihood</p>
+                          <div className="flex items-center gap-2">
+                            <span className="font-serif text-2xl font-black" style={{ color: sel.revivalScore! >= 4 ? "#4ade80" : sel.revivalScore! >= 2 ? "#facc15" : "#f87171" }}>{sel.revivalScore}</span>
+                            <span className="text-zinc-600 text-xs">/ 5</span>
+                          </div>
+                          <p className="text-zinc-600 text-xs mt-0.5">timing + signals</p>
+                        </div>
+                      </div>
+                      {sel.roiEstimate !== undefined && sel.roiEstimate > 0 && (
+                        <div className="rounded-xl px-5 py-4" style={{ background: "rgba(0,229,160,0.05)", border: "1px solid rgba(0,229,160,0.18)" }}>
+                          <p className="label mb-1" style={{ color: "rgba(0,229,160,0.6)" }}>Estimated ROI if they adopt</p>
+                          <div className="flex items-end gap-3 mt-1">
+                            <span className="font-serif text-3xl font-black" style={{ color: "var(--teal)" }}>{formatROI(sel.roiEstimate)}</span>
+                            <span className="text-zinc-500 text-xs pb-1">value created per month</span>
+                          </div>
+                          {sel.roiReason && (
+                            <p className="text-zinc-400 text-xs mt-2 leading-relaxed">{sel.roiReason}</p>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
 
                 {sel.signals && sel.signals.scoreBoost > 0 && (
