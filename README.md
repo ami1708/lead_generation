@@ -268,18 +268,3 @@ All enrichment and scoring runs **fully in parallel** — 10 leads take the same
 9. Click **Export CSV** — download scored results for the CRM
 
 ---
-
-## Built at
-
-**Hackathon 2025** — Built in one session from scratch.
-
-Stack decisions made under time pressure:
-- Anthropic (no credits) → Gemini (quota hit) → **Groq** (free, fast, works)
-- Clerk auth removed → public routes for zero-friction demo
-- No DB needed → stateless scoring pipeline, export to CSV
-
----
-
-## License
-
-MIT
