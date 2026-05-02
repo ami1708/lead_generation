@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import type { Lead } from "@/app/api/process-leads/route";
+import { rateLimit, getIP, rateLimitResponse } from "@/lib/rate-limit";
 
 // ── HubSpot ──────────────────────────────────────────────────────────────────
 async function fetchHubSpot(apiKey: string): Promise<Lead[]> {
@@ -118,6 +119,10 @@ async function fetchTeamgate(apiKey: string): Promise<Lead[]> {
 
 // ── Main handler ──────────────────────────────────────────────────────────────
 export async function POST(req: NextRequest) {
+  const ip = getIP(req);
+  const { allowed, retryAfter } = rateLimit(`crm:${ip}`, 20, 5 * 60 * 1000); // 20 req / 5 min
+  if (!allowed) return rateLimitResponse(retryAfter);
+
   try {
     const { crm, apiKey, instanceUrl } = await req.json();
 

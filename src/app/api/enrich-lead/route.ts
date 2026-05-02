@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { tavily } from "@tavily/core";
+import { rateLimit, getIP, rateLimitResponse } from "@/lib/rate-limit";
 import type { Lead } from "@/app/api/process-leads/route";
 
 export interface EnrichmentSignals {
@@ -26,6 +27,10 @@ async function searchWeb(client: ReturnType<typeof tavily>, query: string): Prom
 }
 
 export async function POST(req: NextRequest) {
+  const ip = getIP(req);
+  const { allowed, retryAfter } = rateLimit(`enrich-lead:${ip}`, 10, 5 * 60 * 1000); // 10 req / 5 min
+  if (!allowed) return rateLimitResponse(retryAfter);
+
   const tavilyKey = process.env.TAVILY_API_KEY;
   if (!tavilyKey) {
     return NextResponse.json({ signals: null });

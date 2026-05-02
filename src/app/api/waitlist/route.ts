@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
+import { rateLimit, getIP, rateLimitResponse } from "@/lib/rate-limit";
 
 export async function POST(req: NextRequest) {
+  const ip = getIP(req);
+  const { allowed, retryAfter } = rateLimit(`waitlist:${ip}`, 3, 60 * 60 * 1000); // 3 req / hour
+  if (!allowed) return rateLimitResponse(retryAfter);
+
   try {
     const { email, company } = await req.json();
 

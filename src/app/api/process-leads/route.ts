@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import Groq from "groq-sdk";
+import { rateLimit, getIP, rateLimitResponse } from "@/lib/rate-limit";
 import { tavily } from "@tavily/core";
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
@@ -122,6 +123,10 @@ Return ONLY valid JSON:
 }
 
 export async function POST(req: NextRequest) {
+  const ip = getIP(req);
+  const { allowed, retryAfter } = rateLimit(`process-leads:${ip}`, 5, 15 * 60 * 1000); // 5 req / 15 min
+  if (!allowed) return rateLimitResponse(retryAfter);
+
   try {
     const { leads, businessName, product, tone } = await req.json();
 
