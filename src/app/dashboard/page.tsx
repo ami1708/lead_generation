@@ -124,7 +124,7 @@ export default function Dashboard() {
     return (
       <div className="min-h-screen bg-[#080808] text-white flex flex-col">
         <header className="flex items-center px-8 py-4" style={{ borderBottom: border }}>
-          <span className="font-serif font-bold text-lg">Revive<span style={{ color: "var(--teal)" }}>IQ</span></span>
+          <span className="font-serif font-bold text-lg">Sales<span style={{ color: "var(--teal)" }}>Dhan</span></span>
         </header>
         <div className="flex-1 flex items-center justify-center px-8">
           <div className="max-w-sm w-full">
@@ -178,7 +178,7 @@ export default function Dashboard() {
       <div className="min-h-screen bg-[#080808] text-white flex flex-col">
         <header className="sticky top-0 z-40 flex items-center justify-between px-8 py-4"
           style={{ background: "rgba(8,8,8,0.92)", backdropFilter: "blur(12px)", borderBottom: border }}>
-          <a href="/" className="font-serif font-bold text-lg">Revive<span style={{ color: "var(--teal)" }}>IQ</span></a>
+          <a href="/" className="font-serif font-bold text-lg">Sales<span style={{ color: "var(--teal)" }}>Dhan</span></a>
           <div className="flex items-center gap-3">
             <span className="text-zinc-600 text-xs">{results.length} leads scored</span>
             <button onClick={exportCSV} className="btn-ghost text-xs px-4 py-2">Export CSV</button>
@@ -362,7 +362,7 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-[#080808] text-white flex flex-col">
       <header className="flex items-center justify-between px-8 py-4" style={{ borderBottom: border }}>
-        <a href="/" className="font-serif font-bold text-lg">Revive<span style={{ color: "var(--teal)" }}>IQ</span></a>
+        <a href="/" className="font-serif font-bold text-lg">Sales<span style={{ color: "var(--teal)" }}>Dhan</span></a>
         <span className="text-zinc-600 text-xs">AI Lead Revival Engine</span>
       </header>
 
