@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import Groq from "groq-sdk";
+import Anthropic from "@anthropic-ai/sdk";
 import { rateLimit, getIP, rateLimitResponse } from "@/lib/rate-limit";
 import { tavily } from "@tavily/core";
 
-let groq: Groq;
-function getGroq() {
-  if (!groq) groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
-  return groq;
+let anthropic: Anthropic;
+function getAnthropic() {
+  if (!anthropic) anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+  return anthropic;
 }
 
 export interface Lead {
@@ -150,13 +150,12 @@ export async function POST(req: NextRequest) {
         const prompt = buildPrompt(lead, businessName, product, signals);
 
         try {
-          const completion = await getGroq().chat.completions.create({
-            model: "llama-3.1-8b-instant",
-            messages: [{ role: "user", content: prompt }],
+          const completion = await getAnthropic().messages.create({
+            model: "claude-haiku-4-5-20251001",
             max_tokens: 300,
-            temperature: 0.3,
+            messages: [{ role: "user", content: prompt }],
           });
-          const text = completion.choices[0]?.message?.content || "";
+          const text = completion.content[0].type === "text" ? completion.content[0].text : "";
           // Extract JSON object even if model wraps it in extra text
           const match = text.match(/\{[\s\S]*\}/);
           if (!match) throw new Error("No JSON in response");
