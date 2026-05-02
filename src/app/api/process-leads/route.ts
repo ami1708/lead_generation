@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import Anthropic from "@anthropic-ai/sdk";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import { rateLimit, getIP, rateLimitResponse } from "@/lib/rate-limit";
 import { tavily } from "@tavily/core";
 
-let anthropic: Anthropic;
-function getAnthropic() {
-  if (!anthropic) anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-  return anthropic;
+let genAI: GoogleGenerativeAI;
+function getGenAI() {
+  if (!genAI) genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
+  return genAI;
 }
 
 export interface Lead {
@@ -150,12 +150,9 @@ export async function POST(req: NextRequest) {
         const prompt = buildPrompt(lead, businessName, product, signals);
 
         try {
-          const completion = await getAnthropic().messages.create({
-            model: "claude-haiku-4-5-20251001",
-            max_tokens: 300,
-            messages: [{ role: "user", content: prompt }],
-          });
-          const text = completion.content[0].type === "text" ? completion.content[0].text : "";
+          const model = getGenAI().getGenerativeModel({ model: "gemini-2.0-flash" });
+          const result = await model.generateContent(prompt);
+          const text = result.response.text();
           // Extract JSON object even if model wraps it in extra text
           const match = text.match(/\{[\s\S]*\}/);
           if (!match) throw new Error("No JSON in response");
