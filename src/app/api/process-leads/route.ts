@@ -3,7 +3,11 @@ import Groq from "groq-sdk";
 import { rateLimit, getIP, rateLimitResponse } from "@/lib/rate-limit";
 import { tavily } from "@tavily/core";
 
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+let groq: Groq;
+function getGroq() {
+  if (!groq) groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+  return groq;
+}
 
 export interface Lead {
   name: string;
@@ -146,7 +150,7 @@ export async function POST(req: NextRequest) {
         const prompt = buildPrompt(lead, businessName, product, signals);
 
         try {
-          const completion = await groq.chat.completions.create({
+          const completion = await getGroq().chat.completions.create({
             model: "llama-3.1-8b-instant",
             messages: [{ role: "user", content: prompt }],
             max_tokens: 300,
