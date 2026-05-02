@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import Groq from "groq-sdk";
 import { rateLimit, getIP, rateLimitResponse } from "@/lib/rate-limit";
 import { tavily } from "@tavily/core";
 
-let genAI: GoogleGenerativeAI;
-function getGenAI() {
-  if (!genAI) genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
-  return genAI;
+let groq: Groq;
+function getGroq() {
+  if (!groq) groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+  return groq;
 }
 
 export interface Lead {
@@ -150,9 +150,13 @@ export async function POST(req: NextRequest) {
         const prompt = buildPrompt(lead, businessName, product, signals);
 
         try {
-          const model = getGenAI().getGenerativeModel({ model: "gemini-2.0-flash" });
-          const result = await model.generateContent(prompt);
-          const text = result.response.text();
+          const completion = await getGroq().chat.completions.create({
+            model: "llama-3.1-8b-instant",
+            messages: [{ role: "user", content: prompt }],
+            max_tokens: 300,
+            temperature: 0.3,
+          });
+          const text = completion.choices[0]?.message?.content || "";
           // Extract JSON object even if model wraps it in extra text
           const match = text.match(/\{[\s\S]*\}/);
           if (!match) throw new Error("No JSON in response");
