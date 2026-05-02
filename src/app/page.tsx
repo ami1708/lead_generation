@@ -27,7 +27,7 @@ export default function LandingPage() {
       <nav className="fixed inset-x-0 top-0 z-50 flex items-center justify-between px-8 py-4"
         style={{ background: "rgba(8,8,8,0.85)", backdropFilter: "blur(12px)", borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
         <span className="font-serif text-xl font-bold tracking-tight">
-          Revive<span style={{ color: "var(--teal)" }}>IQ</span>
+          Sales<span style={{ color: "var(--teal)" }}>Dhan</span>
         </span>
         <div className="flex items-center gap-3">
           <a href="#early-access" className="btn-ghost text-xs px-5 py-2.5">Get early access</a>
@@ -57,7 +57,7 @@ export default function LandingPage() {
           </h1>
 
           <p className="anim-fade-up delay-200 text-zinc-400 text-lg max-w-xl mx-auto leading-relaxed mb-10">
-            Upload your cold leads. ReviveIQ searches the web for funding rounds, hiring signals,
+            Upload your cold leads. SalesDhan searches the web for funding rounds, hiring signals,
             and intent data — then scores every lead with AI so your team calls the right people first.
           </p>
 
@@ -130,7 +130,7 @@ export default function LandingPage() {
         <div className="grid md:grid-cols-2 gap-5">
           {/* Before */}
           <div className="card p-7" style={{ borderColor: "rgba(248,113,113,0.15)", background: "rgba(248,113,113,0.04)" }}>
-            <p className="label mb-5" style={{ color: "#f87171" }}>Without ReviveIQ</p>
+            <p className="label mb-5" style={{ color: "#f87171" }}>Without SalesDhan</p>
             <ul className="space-y-4">
               {[
                 "1,000 leads dumped with zero priority or context",
@@ -149,7 +149,7 @@ export default function LandingPage() {
 
           {/* After */}
           <div className="card p-7" style={{ borderColor: "rgba(0,229,160,0.2)", background: "rgba(0,229,160,0.04)" }}>
-            <p className="label mb-5" style={{ color: "var(--teal)" }}>With ReviveIQ</p>
+            <p className="label mb-5" style={{ color: "var(--teal)" }}>With SalesDhan</p>
             <ul className="space-y-4">
               {[
                 "Every lead scored — hottest ones surface instantly",
@@ -201,7 +201,7 @@ export default function LandingPage() {
               Scores from<br />the entire internet.
             </h2>
             <p className="text-zinc-400 leading-relaxed mb-8">
-              Before scoring each lead, ReviveIQ searches the web for real buying signals.
+              Before scoring each lead, SalesDhan searches the web for real buying signals.
               A company that raised funding last month scores dramatically higher — and your
               agent&apos;s message reflects that.
             </p>
@@ -282,7 +282,7 @@ export default function LandingPage() {
       {/* ── FOOTER ── */}
       <footer style={{ borderTop: "1px solid rgba(255,255,255,0.07)" }}
         className="py-7 px-8 flex items-center justify-between max-w-5xl mx-auto text-zinc-600 text-xs">
-        <span className="font-serif font-bold text-zinc-400">ReviveIQ</span>
+        <span className="font-serif font-bold text-zinc-400">SalesDhan</span>
         <span>© {new Date().getFullYear()}</span>
       </footer>
     </main>

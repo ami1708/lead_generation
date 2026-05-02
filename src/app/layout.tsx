@@ -21,7 +21,7 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "ReviveIQ — Turn Dead Leads Into Revenue",
+  title: "SalesDhan — Turn Dead Leads Into Revenue",
   description: "AI-powered lead revival engine. Automatically score, warm up, and convert your cold leads back into paying customers.",
 };
 

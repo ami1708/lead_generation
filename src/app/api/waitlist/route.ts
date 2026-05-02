@@ -33,9 +33,9 @@ export async function POST(req: NextRequest) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          from: "ReviveIQ <onboarding@resend.dev>",
+          from: "SalesDhan <onboarding@resend.dev>",
           to: [notifyEmail],
-          subject: `New ReviveIQ signup: ${company}`,
+          subject: `New SalesDhan signup: ${company}`,
           text: `New early access signup!\n\nEmail: ${email}\nCompany: ${company}\nTime: ${new Date().toLocaleString()}`,
         }),
       });
