@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { useSession, signIn, signOut } from "next-auth/react";
 
 export default function LandingPage() {
+  const { data: session } = useSession();
   const [email,   setEmail]   = useState("");
   const [company, setCompany] = useState("");
   const [submitted, setSubmitted] = useState(false);
@@ -30,8 +32,18 @@ export default function LandingPage() {
           Sales<span style={{ color: "var(--teal)" }}>Dhan</span>
         </span>
         <div className="flex items-center gap-3">
-          <a href="#early-access" className="btn-ghost text-xs px-5 py-2.5">Get early access</a>
-          <a href="/dashboard" className="btn-teal text-xs px-5 py-2.5">Live demo →</a>
+          {session ? (
+            <>
+              <span className="text-zinc-400 text-xs hidden sm:block">{session.user?.email}</span>
+              <a href="/dashboard" className="btn-teal text-xs px-5 py-2.5">Dashboard →</a>
+              <button onClick={() => signOut()} className="btn-ghost text-xs px-4 py-2.5">Sign out</button>
+            </>
+          ) : (
+            <>
+              <a href="#early-access" className="btn-ghost text-xs px-5 py-2.5">Get early access</a>
+              <button onClick={() => signIn("google", { callbackUrl: "/dashboard" })} className="btn-teal text-xs px-5 py-2.5">Sign in →</button>
+            </>
+          )}
         </div>
       </nav>
 
